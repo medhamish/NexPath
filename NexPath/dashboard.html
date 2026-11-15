@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexPath — Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<script src="https://unpkg.com/lucide@0.441.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Primary">
+    <a class="logo" href="#overview"><span class="logo-mark"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V5l14 14V5"/></svg></span>NexPath</a>
+    <nav>
+      <p class="nav-label">Workspace</p>
+      <div id="nav-workspace"></div>
+      <p class="nav-label">Preferences</p>
+      <div id="nav-prefs"></div>
+    </nav>
+    <button class="me" id="me-card" aria-label="Open profile"><span class="avatar" id="me-avatar"></span><span class="me-text"><strong id="me-name"></strong><small id="me-sub"></small></span></button>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open navigation"><i data-lucide="menu" class="i"></i></button>
+      <p class="date" id="today"></p>
+      <div class="top-actions">
+        <div class="pop-wrap">
+          <button class="icon-btn" id="bell" aria-label="Notifications" aria-expanded="false"><i data-lucide="bell" class="i"></i><span class="dot" id="bell-dot"></span></button>
+          <div class="pop card" id="bell-pop" hidden>
+            <div class="pop-head"><strong>Notifications</strong><button class="link" id="mark-read">Mark all read</button></div>
+            <div id="notif-list"></div>
+          </div>
+        </div>
+        <div class="pop-wrap">
+          <button class="profile-btn" id="profile-btn" aria-label="Account menu" aria-expanded="false"><span class="avatar sm" id="top-avatar"></span><i data-lucide="chevron-down" class="i"></i></button>
+          <div class="pop card menu" id="profile-pop" hidden>
+            <button data-act="edit-profile"><i data-lucide="user-round-pen" class="i"></i>Edit profile</button>
+            <button data-go="settings"><i data-lucide="settings" class="i"></i>Settings</button>
+            <button data-act="reset"><i data-lucide="rotate-ccw" class="i"></i>Reset saved data</button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main id="view" class="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close-modal></div>
+  <div class="modal-box card" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal-head"><div><h2 id="m-title">Your career profile</h2><p>All fields are required for personalized recommendations.</p></div><button class="icon-btn" data-close-modal aria-label="Close"><i data-lucide="x" class="i"></i></button></div>
+    <form id="profile-form" class="form" novalidate onsubmit="return false"></form>
+    <div class="modal-foot"><button class="btn" data-close-modal>Cancel</button><button class="btn btn-primary" id="profile-save">Save profile</button></div>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="js/app.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
