@@ -1,0 +1,1214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexPath — Dashboard</title>
+<script>try{var p=JSON.parse(localStorage.getItem("nexpath:prefs")||"{}");document.documentElement.dataset.theme=["light","dark","sand"].indexOf(p.theme)>-1?p.theme:"light"}catch(e){}</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:light;--bg:#F8F9FC;--card:#fff;--surface:#fff;--surface2:#F3F4FA;--ink:#0F1729;--ink2:#4B5675;--ink3:#8089A5;--line:#E6E9F2;--bd2:#D5D9EA;--bd3:#C3C8EA;--track:#EDEFF7;--accent:#4F46E5;--accent-hover:#3730A3;--accent-soft:#EEF0FF;--accent-ink:#3730A3;--ok:#0E9F6E;--ok-bg:#E6F7F0;--ok-bg2:#F6FCF9;--ok-bd:#BFE9D8;--ok-ink:#0B6B4B;--err:#D92D4A;--hero-from:#fff;--hero-to:#FAFAFF;--hero-bd:#D9DCF8;--empty-bg:#FBFBFE;--topbar:rgba(248,249,252,.9);--toast-bg:#0F1729;--r:12px;--shadow:0 1px 2px rgba(15,23,41,.04),0 4px 14px rgba(15,23,41,.04);--font:'Plus Jakarta Sans',Inter,system-ui,sans-serif}
+[data-theme=dark]{color-scheme:dark;--bg:#0B0F1A;--card:#121829;--surface:#121829;--surface2:#1B2338;--ink:#E8EBF5;--ink2:#A7B0C8;--ink3:#7A849E;--line:#242C44;--bd2:#303A58;--bd3:#3A4466;--track:#222B44;--accent:#6366F1;--accent-hover:#4F46E5;--accent-soft:rgba(99,102,241,.18);--accent-ink:#B4B8FF;--ok:#34D399;--ok-bg:rgba(52,211,153,.14);--ok-bg2:rgba(52,211,153,.07);--ok-bd:rgba(52,211,153,.35);--ok-ink:#6EE7B7;--err:#FB7185;--hero-from:#151C33;--hero-to:#121829;--hero-bd:#2C3566;--empty-bg:#0F1524;--topbar:rgba(11,15,26,.88);--toast-bg:#2A3350;--shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25)}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px;overflow-x:hidden}
+body.lock{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+a{color:inherit;text-decoration:none}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.i{width:18px;height:18px;stroke-width:1.75;flex:none}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--surface);transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{border-color:var(--bd3);background:var(--surface2)}.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.toasts{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:10px;z-index:100}
+.toast{display:flex;gap:10px;align-items:center;background:var(--toast-bg);color:#fff;padding:12px 16px;border-radius:10px;font-size:14px;box-shadow:0 8px 24px rgba(15,23,41,.25);animation:tin .25s ease}
+.toast.success .i{color:#5EEAD4}.toast.info .i{color:#A5B4FC}.toast.error .i{color:#FDA4AF}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+[data-theme=sand]{color-scheme:light;--bg:#F7F3EC;--card:#FFFDF9;--surface:#FFFDF9;--surface2:#F3EDE2;--ink:#2B2118;--ink2:#6B5D4D;--ink3:#9A8C7A;--line:#E8DFD0;--bd2:#DDD2BF;--bd3:#CFC1A9;--track:#EBE3D5;--accent:#B4532A;--accent-hover:#8A3B18;--accent-soft:#F8E9DF;--accent-ink:#8A3B18;--ok:#2E7D5B;--ok-bg:#E3F1E8;--ok-bg2:#F1F8F3;--ok-bd:#BBDDC6;--ok-ink:#1E6B45;--err:#C0392B;--hero-from:#FFFDF9;--hero-to:#FBF3E8;--hero-bd:#E8D5BF;--empty-bg:#FBF7F0;--topbar:rgba(247,243,236,.9);--toast-bg:#2B2118;--shadow:0 1px 2px rgba(43,33,24,.05),0 4px 14px rgba(43,33,24,.05)}
+[data-motion=reduced] *{animation:none!important;transition:none!important}
+
+</style>
+<style>
+.shell{display:flex;min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:256px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:20px 14px;z-index:40;transition:transform .25s ease}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em;padding:4px 10px 22px}
+.logo-mark{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center}
+nav{flex:1;overflow-y:auto}
+.nav-label{font-size:12px;font-weight:600;color:var(--ink3);padding:14px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border-radius:9px;color:var(--ink2);font-weight:500;font-size:14px;text-align:left;position:relative;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--surface2);color:var(--ink)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.nav-item.active::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+.soon{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink3);background:var(--surface2);border-radius:20px;padding:1px 8px}
+.me{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;text-align:left;width:100%;transition:border-color .15s}
+.me:hover{border-color:var(--bd3)}
+.me-text{display:flex;flex-direction:column;min-width:0}.me-text strong{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.me-text small{font-size:12px;color:var(--ink3)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.avatar.sm{width:32px;height:32px;font-size:13px}
+.main{flex:1;margin-left:256px;min-width:0}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 36px;background:var(--topbar);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.date{color:var(--ink3);font-size:14px;font-weight:500}
+.top-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.icon-btn{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--ink2);position:relative;border:1px solid transparent}
+.icon-btn:hover{background:var(--surface);border-color:var(--line)}
+.menu-btn{display:none}
+.dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.profile-btn{display:flex;align-items:center;gap:4px;padding:3px 6px 3px 3px;border-radius:30px;color:var(--ink3);border:1px solid var(--line);background:var(--surface)}
+.pop-wrap{position:relative}
+.pop{position:absolute;right:0;top:46px;width:320px;max-width:calc(100vw - 32px);padding:8px;animation:tin .15s ease;box-shadow:0 12px 32px rgba(15,23,41,.12)}
+.pop.menu{width:210px}
+.pop.menu button{display:flex;gap:10px;align-items:center;width:100%;padding:9px 10px;border-radius:8px;font-size:14px;color:var(--ink2)}
+.pop.menu button:hover{background:var(--surface2);color:var(--ink)}
+.pop-head{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;font-size:14px}
+.link{color:var(--accent);font-size:13px;font-weight:600}
+.notif{display:flex;gap:10px;padding:10px;border-radius:8px;font-size:14px}
+.notif p{color:var(--ink2);font-size:13px}
+.notif .i{color:var(--accent);margin-top:2px}
+.view{padding:36px;max-width:1120px;margin:0 auto;outline:0}
+.view>*+*{margin-top:24px}
+h1{font-size:28px;letter-spacing:-.025em;line-height:1.2;font-weight:800}
+.sub{color:var(--ink2);margin-top:4px}
+h2{font-size:17px;letter-spacing:-.01em;font-weight:700}
+.sec-sub{color:var(--ink2);font-size:14px;margin-top:2px}
+.hero{position:relative;overflow:hidden;padding:36px;display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;border-color:var(--hero-bd);background:linear-gradient(180deg,var(--hero-from),var(--hero-to))}
+.hero h2{font-size:30px;line-height:1.15;letter-spacing:-.03em;font-weight:800;max-width:14ch}
+.hero p{color:var(--ink2);margin-top:12px;max-width:46ch}
+.hero .cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:24px}
+.hero .cta small{color:var(--ink3);font-size:13px;max-width:26ch}
+.hero>svg{width:100%;height:auto;max-height:190px}
+.path-line{stroke:var(--bd3);stroke-width:2;stroke-dasharray:3 7;stroke-linecap:round;fill:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.stat{padding:22px;display:flex;gap:16px;align-items:flex-start}
+.stat-ico{width:42px;height:42px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.stat-ico.ok{background:var(--ok-bg);color:var(--ok)}
+.stat small{color:var(--ink3);font-size:13px;font-weight:500}
+.stat .val{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
+.stat p{color:var(--ink2);font-size:14px;margin-top:2px}
+.panel{padding:24px}
+.panel-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap}
+.bar{height:8px;background:var(--track);border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:8px;transition:width .5s ease}
+.pct{display:flex;align-items:center;gap:14px;margin-bottom:18px}.pct strong{font-size:15px;min-width:42px}.pct .bar{flex:1}
+.checks{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.check{padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:13px;color:var(--ink3)}
+.check b{display:flex;align-items:center;gap:6px;color:var(--ink2);font-weight:600;font-size:13px;margin-bottom:2px}
+.check.done{border-color:var(--ok-bd);background:var(--ok-bg2)}.check.done b{color:var(--ok)}
+.check span{display:block;color:var(--ink);font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{text-align:center;padding:34px 20px;border:1px dashed var(--bd2);border-radius:var(--r);background:var(--empty-bg)}
+.empty .stat-ico{margin:0 auto 12px}
+.empty p{color:var(--ink2);max-width:40ch;margin:4px auto 16px;font-size:14px}
+.skillgroup+.skillgroup{margin-top:14px}.skillgroup h3{font-size:13px;color:var(--ink2);margin-bottom:8px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{padding:4px 12px;border-radius:20px;background:var(--accent-soft);color:var(--accent-ink);font-size:13px;font-weight:500}
+.activity{list-style:none;padding:0}.activity li{display:flex;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:14px}.activity li:first-child{border-top:0}
+.activity .i{color:var(--accent)}
+.activity time{margin-left:auto;color:var(--ink3);font-size:13px;white-space:nowrap}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.action{padding:18px;text-align:left;display:flex;flex-direction:column;gap:12px;transition:border-color .15s,transform .15s}
+.action:hover{border-color:var(--bd3);transform:translateY(-2px)}
+.action b{font-size:14px}.action small{color:var(--ink3);font-size:13px;margin-top:-8px}
+.cs{padding:56px 24px;text-align:center}.cs .stat-ico{margin:0 auto 14px;width:52px;height:52px}.cs p{color:var(--ink2);max-width:46ch;margin:8px auto 20px}
+.plist{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px}.plist dt{font-size:13px;color:var(--ink3)}.plist dd{margin:0;font-weight:500}
+.modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px}
+.modal-bg{position:absolute;inset:0;background:rgba(15,23,41,.4)}
+.modal-box{position:relative;width:100%;max-width:620px;max-height:92vh;overflow:auto;padding:26px;animation:tin .2s ease}
+.modal-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:20px}.modal-head p{color:var(--ink2);font-size:14px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field.wide{grid-column:1/-1}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.field input,.field select{width:100%;padding:10px 12px;border:1px solid var(--bd2);border-radius:10px;background:var(--surface);font-size:14px}
+.field input:focus,.field select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.field .invalid{border-color:var(--err)}.field small{color:var(--ink3);font-size:12px}.err{display:block;color:var(--err);font-size:12px}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+.scrim{position:fixed;inset:0;background:rgba(15,23,41,.4);z-index:30}
+.skeleton{height:150px;border-radius:var(--r);background:linear-gradient(90deg,var(--track) 25%,var(--surface2) 50%,var(--track) 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media(max-width:1024px){.checks,.actions{grid-template-columns:1fr 1fr}.hero{grid-template-columns:1fr}.hero>svg{display:none}}
+@media(max-width:860px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:none;box-shadow:0 0 40px rgba(15,23,41,.2)}.main{margin-left:0}.menu-btn{display:grid}.topbar{padding:12px 16px}.view{padding:20px 16px}}
+@media(max-width:640px){.grid2,.form,.plist{grid-template-columns:1fr}.hero{padding:24px}.hero h2{font-size:25px}h1{font-size:24px}.activity li{flex-wrap:wrap}.activity time{margin-left:30px;width:100%}.toasts{left:16px;right:16px}}
+@media(max-width:420px){.checks,.actions{grid-template-columns:1fr}}
+.drop{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:56px 20px;border:1.5px dashed var(--bd3);border-radius:var(--r);background:var(--surface);cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop .stat-ico{margin-bottom:8px}.drop small{color:var(--ink3)}
+.ra-err{color:var(--err);font-size:14px;margin-top:12px}
+.ra-note{display:flex;gap:8px;align-items:center;color:var(--ink3);font-size:13px;margin-top:14px}
+.ra-busy{display:flex;gap:16px;align-items:center}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--accent-soft);border-top-color:var(--accent);animation:sp .8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.checks.two{grid-template-columns:1fr 1fr}.ra-grid{align-items:start;margin-top:20px}
+@media(max-width:420px){.checks.two{grid-template-columns:1fr}}
+.ra-dbg{margin-top:14px;font-size:13px;color:var(--ink2)}.ra-dbg summary{cursor:pointer;font-weight:600}.ra-pre{white-space:pre-wrap;word-break:break-word;font:12px/1.5 ui-monospace,monospace;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:260px;overflow:auto;margin-top:8px}
+.sel{padding:9px 12px;border:1px solid var(--bd2);border-radius:10px;background:var(--surface);font-size:14px;max-width:100%}
+.chip.have{background:var(--ok-bg);color:var(--ok-ink)}.chip.miss{background:var(--surface);color:var(--ink2);border:1px dashed var(--bd3)}
+.chips+.chips{margin-top:8px}
+.next{list-style:none;padding:0;margin:14px 0 0;counter-reset:n}.next li{counter-increment:n;display:flex;gap:12px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line);font-size:14px;flex-wrap:wrap}.next li:first-child{border-top:0}
+.next li::before{content:counter(n);width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none;align-self:center}
+.next span{color:var(--ink2)}.sa-h{font-size:13px;color:var(--ink2);margin:18px 0 8px;font-weight:600}
+.rm-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:6px}
+.rm-num{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.rm-steps{list-style:none;padding:0;margin:8px 0 0 44px}
+.rm-steps li{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.rm-steps b{font-size:14px}.rm-steps p{color:var(--ink2);font-size:14px;margin:2px 0 4px}
+.rm-steps li.on b{color:var(--ink3);text-decoration:line-through}
+.rm-steps .link{display:inline-block;margin-right:12px}
+.tick{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--bd3);background:var(--surface);display:grid;place-items:center;flex:none;margin-top:1px;transition:background .15s,border-color .15s}
+.tick .i{width:14px;height:14px;color:#fff;stroke-width:3;opacity:0}
+.tick:hover{border-color:var(--accent)}.li.on .tick,.on .tick{background:var(--accent);border-color:var(--accent)}.on .tick .i{opacity:1}
+@media(max-width:640px){.rm-steps{margin-left:0}}
+.chat{display:flex;flex-direction:column;height:min(620px,calc(100vh - 230px));min-height:400px;overflow:hidden}
+.chat-log{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:80%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:var(--surface2);border-bottom-left-radius:4px}
+.msg ul{padding-left:18px;margin:6px 0}.msg.err p{color:var(--err);margin-bottom:8px}
+.typing{display:flex;gap:5px;padding:14px 16px}.typing i{width:7px;height:7px;border-radius:50%;background:var(--ink3);animation:bn 1.1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bn{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.sugg{display:flex;flex-wrap:wrap;gap:8px}.sugg button{padding:7px 13px;border:1px solid var(--line);border-radius:20px;background:var(--surface);font-size:13px;color:var(--ink2)}.sugg button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.composer{display:flex;gap:10px;padding:14px;border-top:1px solid var(--line);align-items:flex-end}
+.composer textarea{flex:1;resize:none;border:1px solid var(--bd2);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;max-height:120px}
+.composer textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}.composer .btn{padding:10px 14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:640px){.msg{max-width:92%}}
+.faq{border-top:1px solid var(--line)}.faq:first-child{border-top:0}
+.faq summary{cursor:pointer;padding:14px 0;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--ink3);font-size:18px;line-height:1}
+.faq[open] summary::after{content:"–"}.faq p{color:var(--ink2);font-size:14px;padding:0 24px 16px 0}
+.check .link{font-size:13px;padding:0}
+textarea{background:var(--surface)}
+.seg{display:inline-flex;gap:4px;padding:4px;background:var(--surface2);border-radius:12px;max-width:100%}
+.seg button{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:9px;font-weight:600;font-size:14px;color:var(--ink2)}
+.seg button[aria-checked=true]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.switch-row{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-top:14px}.switch-row p{color:var(--ink2);font-size:14px}
+.switch{width:44px;height:26px;border-radius:20px;background:var(--bd2);position:relative;flex:none;transition:background .15s}
+.switch i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch[aria-checked=true]{background:var(--accent)}.switch[aria-checked=true] i{transform:translateX(18px)}
+@media(max-width:640px){.seg{display:flex;width:100%}.seg button{flex:1;justify-content:center;padding:8px}}
+.cal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cal-stats .card{padding:14px 18px;display:flex;flex-direction:column}.cal-stats small{color:var(--ink3);font-size:13px;font-weight:500}.cal-stats b{font-size:22px;letter-spacing:-.02em}.cal-stats b.warn{color:var(--err)}
+.cal-wrap{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-dow{font-size:12px;font-weight:600;color:var(--ink3);text-align:center;padding-bottom:4px}
+.cal-day{min-height:68px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:7px 8px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;font-size:14px;font-weight:500;transition:border-color .15s,background .15s}
+.cal-day:hover{border-color:var(--bd3)}.cal-day.today span{background:var(--accent);color:#fff;border-radius:6px;padding:0 6px}
+.cal-day.sel{background:var(--accent-soft);border-color:var(--accent)}
+.dots{display:flex;gap:3px;min-height:6px}.dots b{width:6px;height:6px;border-radius:50%;background:var(--accent)}.dots b.d{background:var(--ok)}
+.tasks{list-style:none;padding:0}.tasks li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}.tasks li:first-child{border-top:0}
+.tk-main{flex:1;min-width:0}.tk-main b{font-size:14px;overflow-wrap:anywhere}.tk-main p{color:var(--ink2);font-size:13px;margin:1px 0 0;overflow-wrap:anywhere}
+.tasks li.on b{color:var(--ink3);text-decoration:line-through}
+.tk-act{display:flex;flex:none}.tk-act .icon-btn{width:32px;height:32px}
+.tag-over{font-size:11px;font-weight:700;color:var(--err);margin-left:6px}
+@media(max-width:1024px){.cal-wrap{grid-template-columns:1fr}}
+@media(max-width:640px){.cal-day{min-height:46px;padding:5px;font-size:13px}.cal-grid{gap:4px}.cal-stats{gap:8px}.cal-stats .card{padding:12px}}
+
+</style>
+<script src="https://unpkg.com/lucide@0.441.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Primary">
+    <a class="logo" href="#overview"><span class="logo-mark"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V5l14 14V5"/></svg></span>NexPath</a>
+    <nav>
+      <p class="nav-label">Workspace</p>
+      <div id="nav-workspace"></div>
+      <p class="nav-label">Preferences</p>
+      <div id="nav-prefs"></div>
+    </nav>
+    <button class="me" id="me-card" aria-label="Open profile"><span class="avatar" id="me-avatar"></span><span class="me-text"><strong id="me-name"></strong><small id="me-sub"></small></span></button>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open navigation"><i data-lucide="menu" class="i"></i></button>
+      <p class="date" id="today"></p>
+      <div class="top-actions">
+        <div class="pop-wrap">
+          <button class="icon-btn" id="bell" aria-label="Notifications" aria-expanded="false"><i data-lucide="bell" class="i"></i><span class="dot" id="bell-dot"></span></button>
+          <div class="pop card" id="bell-pop" hidden>
+            <div class="pop-head"><strong>Notifications</strong><button class="link" id="mark-read">Mark all read</button></div>
+            <div id="notif-list"></div>
+          </div>
+        </div>
+        <div class="pop-wrap">
+          <button class="profile-btn" id="profile-btn" aria-label="Account menu" aria-expanded="false"><span class="avatar sm" id="top-avatar"></span><i data-lucide="chevron-down" class="i"></i></button>
+          <div class="pop card menu" id="profile-pop" hidden>
+            <button data-act="edit-profile"><i data-lucide="user-round-pen" class="i"></i>Edit profile</button>
+            <button data-go="settings"><i data-lucide="settings" class="i"></i>Settings</button>
+            <button data-act="reset"><i data-lucide="rotate-ccw" class="i"></i>Reset saved data</button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main id="view" class="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-bg" data-close-modal></div>
+  <div class="modal-box card" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal-head"><div><h2 id="m-title">Your career profile</h2><p>All fields are required for personalized recommendations.</p></div><button class="icon-btn" data-close-modal aria-label="Close"><i data-lucide="x" class="i"></i></button></div>
+    <form id="profile-form" class="form" novalidate onsubmit="return false"></form>
+    <div class="modal-foot"><button class="btn" data-close-modal>Cancel</button><button class="btn btn-primary" id="profile-save">Save profile</button></div>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+/* NexPath core: storage adapter, event bus, toasts, public API for future modules.
+   Replace NexPath.storage with an API client later; keep the same get/set signatures. */
+window.NexPath = (() => {
+  const PREFIX = 'nexpath:';
+  const storage = {
+    get(key, fallback = null) { try { const v = localStorage.getItem(PREFIX + key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem(PREFIX + key, JSON.stringify(value)); } catch {} },
+  };
+  const listeners = {};
+  const on = (e, fn) => (listeners[e] = listeners[e] || []).push(fn);
+  const emit = (e, d) => (listeners[e] || []).forEach(fn => fn(d));
+  const icons = () => window.lucide && lucide.createIcons();
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function toast(msg, type = 'info') {
+    const host = document.getElementById('toasts');
+    const el = document.createElement('div');
+    el.className = 'toast ' + type; el.setAttribute('role', 'status');
+    el.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle-2' : type === 'error' ? 'alert-circle' : 'info'}" class="i"></i><span>${esc(msg)}</span>`;
+    host.appendChild(el); icons();
+    setTimeout(() => el.remove(), 3500);
+  }
+  function logActivity(type, text) {
+    const list = storage.get('activity', []);
+    list.unshift({ type, text, at: new Date().toISOString() });
+    storage.set('activity', list.slice(0, 20));
+    emit('change');
+  }
+  /* Hooks for future phases:
+     Phase 1: NexPath.setResume({ fileName, analyzedAt, skills: { "Languages": ["Python"] } })
+     Phase 2+: NexPath.setCareerMatch({ score: 0-100, role: "Data Analyst" })  (real score from backend) */
+  const setResume = r => { storage.set('resume', r); logActivity('resume', `Analyzed resume “${r.fileName}”`); };
+  const setCareerMatch = m => { storage.set('match', m); emit('change'); };
+  return { storage, on, emit, icons, esc, toast, logActivity, setResume, setCareerMatch };
+})();
+
+</script>
+<script>
+/* User preferences: theme (light / dark / sand) and reduced motion. Saved in storage under "prefs". */
+NexPath.prefs = (() => {
+  const { storage } = NexPath;
+  const DEF = { theme: 'light', motion: false };
+  const THEME_IDS = ['light', 'dark', 'sand'];
+  const get = () => ({ ...DEF, ...storage.get('prefs', {}) });
+  function apply() {
+    const p = get();
+    document.documentElement.dataset.theme = THEME_IDS.includes(p.theme) ? p.theme : 'light';
+    document.documentElement.dataset.motion = p.motion ? 'reduced' : '';
+  }
+  const set = patch => { storage.set('prefs', { ...get(), ...patch }); apply(); };
+  const THEMES = [['light', 'Light', 'sun'], ['dark', 'Dark', 'moon'], ['sand', 'Sand', 'sunset']];
+  function view() {
+    const p = get();
+    return `<div><h1>Settings</h1><p class="sub">Personalize NexPath and manage your connections.</p></div>
+    <section class="card panel"><div class="panel-head"><div><h2>Appearance</h2><p class="sec-sub">Choose how NexPath looks.</p></div></div>
+      <div class="seg" role="radiogroup" aria-label="Theme">${THEMES.map(([v, l, ic]) => `<button role="radio" aria-checked="${(THEME_IDS.includes(p.theme) ? p.theme : 'light') === v}" data-theme-opt="${v}"><i data-lucide="${ic}" class="i"></i>${l}</button>`).join('')}</div></section>
+    <section class="card panel"><h2>Accessibility</h2><div class="switch-row"><div><b>Reduce motion</b><p>Turn off animations and transitions.</p></div><button class="switch" role="switch" aria-checked="${p.motion}" aria-label="Reduce motion" data-motion-opt><i></i></button></div></section>`;
+  }
+  function bind() {
+    document.querySelectorAll('[data-theme-opt]').forEach(b => b.onclick = () => { set({ theme: b.dataset.themeOpt }); NexPath.emit('change'); });
+    const sw = document.querySelector('[data-motion-opt]');
+    if (sw) sw.onclick = () => { set({ motion: !get().motion }); NexPath.emit('change'); };
+  }
+  apply();
+  return { get, set, apply, view, bind };
+})();
+
+</script>
+<script>
+/* Profile model, completion calculation, validation and the editable form. */
+NexPath.profile = (() => {
+  const FIELDS = [
+    { key: 'name', label: 'Full name', type: 'text', ph: 'Aarav Sharma' },
+    { key: 'college', label: 'College / university', type: 'text', ph: 'Your institution' },
+    { key: 'degree', label: 'Degree', type: 'text', ph: 'B.Tech' },
+    { key: 'branch', label: 'Branch', type: 'text', ph: 'Computer Science' },
+    { key: 'year', label: 'Current year of study', type: 'select', options: ['1st year', '2nd year', '3rd year', '4th year', 'Postgraduate'] },
+    { key: 'gradYear', label: 'Graduation year', type: 'number', ph: '2027' },
+    { key: 'interests', label: 'Career interests', type: 'text', ph: 'AI, product design, fintech', hint: 'Separate with commas', wide: 1 },
+    { key: 'role', label: 'Target job role', type: 'text', ph: 'Data Analyst', wide: 1 },
+  ];
+  const get = () => NexPath.storage.get('profile', {});
+  const completion = (p = get()) => {
+    const done = FIELDS.filter(f => String(p[f.key] ?? '').trim()).length;
+    return { done, total: FIELDS.length, pct: Math.round(done / FIELDS.length * 100) };
+  };
+  function validate(v) {
+    const e = {};
+    FIELDS.forEach(f => { if (!String(v[f.key] ?? '').trim()) e[f.key] = 'This field is required.'; });
+    const y = +v.gradYear, now = new Date().getFullYear();
+    if (v.gradYear && (y < now - 1 || y > now + 8)) e.gradYear = `Enter a year between ${now - 1} and ${now + 8}.`;
+    return e;
+  }
+  function save(v) {
+    const old = get();
+    NexPath.storage.set('profile', v);
+    NexPath.logActivity('profile', Object.keys(old).length ? 'Updated your profile' : 'Created your career profile');
+    if (old.role && old.role !== v.role) NexPath.logActivity('goal', `Changed target role to ${v.role}`);
+  }
+  function open() {
+    const p = get(), m = document.getElementById('modal'), form = document.getElementById('profile-form');
+    form.innerHTML = FIELDS.map(f => {
+      const input = f.type === 'select'
+        ? `<select id="f-${f.key}" name="${f.key}"><option value="">Select…</option>${f.options.map(o => `<option ${p[f.key] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`
+        : `<input id="f-${f.key}" name="${f.key}" type="${f.type}" value="${NexPath.esc(p[f.key] ?? '')}" placeholder="${f.ph}" autocomplete="off">`;
+      return `<div class="field${f.wide ? ' wide' : ''}"><label for="f-${f.key}">${f.label}</label>${input}${f.hint ? `<small>${f.hint}</small>` : ''}<span class="err" id="e-${f.key}"></span></div>`;
+    }).join('');
+    m.hidden = false; document.body.classList.add('lock');
+    form.querySelector('input').focus();
+  }
+  const close = () => { document.getElementById('modal').hidden = true; document.body.classList.remove('lock'); };
+  function init() {
+    const form = document.getElementById('profile-form');
+    document.querySelectorAll('[data-close-modal]').forEach(b => b.addEventListener('click', close));
+    document.addEventListener('keydown', e => e.key === 'Escape' && close());
+    document.getElementById('profile-save').addEventListener('click', () => {
+      const v = Object.fromEntries(new FormData(form));
+      Object.keys(v).forEach(k => v[k] = v[k].trim());
+      const errs = validate(v);
+      FIELDS.forEach(f => {
+        document.getElementById('e-' + f.key).textContent = errs[f.key] || '';
+        document.getElementById('f-' + f.key).classList.toggle('invalid', !!errs[f.key]);
+      });
+      const first = Object.keys(errs)[0];
+      if (first) { document.getElementById('f-' + first).focus(); return NexPath.toast('Fix the highlighted fields to save.', 'error'); }
+      save(v); close(); NexPath.toast('Profile saved.', 'success');
+    });
+  }
+  return { FIELDS, get, completion, open, close, init };
+})();
+
+</script>
+<script>
+/* Phase 1 — Resume Analyzer (client-side, rule-based).
+   Files are read in the browser; only extracted results are saved.
+   To use a backend later, replace NexPath.resume.analyzer(text, file) with an API call
+   that returns the same shape: { wordCount, skills:{Category:[..]}, sections:{..}, contact:{..} }. */
+NexPath.resume = (() => {
+  const { storage, esc, toast, icons } = NexPath;
+  const $ = s => document.querySelector(s);
+  const MAX = 5 * 1024 * 1024;
+
+  const TAXONOMY = {
+    'Programming languages': 'Python,Java,JavaScript|JS,TypeScript,C++,C#,Kotlin,Swift,PHP,Ruby,Rust,Golang,MATLAB,Scala,Dart',
+    'Web & frontend': 'HTML|HTML5,CSS|CSS3,React|React.js|ReactJS,Angular,Vue|Vue.js,Next.js|NextJS,Tailwind CSS|Tailwind,Bootstrap,Redux,Figma',
+    'Backend & databases': 'Node.js|NodeJS,Express|Express.js,Django,Flask,FastAPI,Spring Boot,REST API|RESTful,GraphQL,SQL,MySQL,PostgreSQL|Postgres,MongoDB,Redis,Firebase,SQLite',
+    'Data & AI': 'Machine Learning,Deep Learning,NLP|Natural Language Processing,Computer Vision,TensorFlow,PyTorch,Scikit-learn|sklearn,Pandas,NumPy,Matplotlib,Power BI,Tableau,Excel|Microsoft Excel,Data Analysis,Data Visualization,Statistics',
+    'Cloud & DevOps': 'AWS|Amazon Web Services,Azure,Google Cloud|GCP,Docker,Kubernetes,Git,GitHub,CI/CD,Linux,Jenkins,Terraform',
+    'Professional': 'Leadership,Communication,Teamwork,Problem Solving,Project Management,Agile,Scrum,Public Speaking,Time Management',
+  };
+  const rx = s => s.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
+  const MATCHERS = Object.entries(TAXONOMY).map(([cat, list]) => [cat, list.split(',').map(e => {
+    const names = e.split('|');
+    return [names[0], new RegExp('(?<![A-Za-z0-9+#])(?:' + names.map(rx).join('|') + ')(?![A-Za-z0-9+#])', 'i')];
+  })]);
+  const SECTIONS = {
+    education: ['Education', /^(education|academic|qualifications?)/i],
+    experience: ['Experience or internships', /^((work|professional|industrial)\s+)?(experience|internships?|employment|work history|training)/i],
+    projects: ['Projects', /^(academic\s+|personal\s+|key\s+)?projects?/i],
+    skills: ['Skills', /^(technical\s+|key\s+|core\s+)?(skills?|competenc|expertise|technologies|tech stack)/i],
+    certifications: ['Certifications', /^(certifications?|certificates?|courses|licenses|achievements|awards)/i],
+    summary: ['Summary or objective', /^(career\s+)?(summary|objective|profile|about)/i],
+  };
+
+
+  const CAPS = { education: /(EDUCATION|ACADEMIC|QUALIFICATIONS?)/, experience: /(EXPERIENCE|INTERNSHIPS?|EMPLOYMENT|WORK HISTORY|TRAINING)/, projects: /PROJECTS?/, skills: /(SKILLS?|COMPETENCIES|EXPERTISE|TECHNOLOGIES|TECH STACK)/, certifications: /(CERTIFICATIONS?|CERTIFICATES?|COURSES|LICENSES|ACHIEVEMENTS|AWARDS)/, summary: /(SUMMARY|OBJECTIVE|PROFILE|ABOUT ME)/ };
+  const CONTENT = {
+    education: /\b(b\.?\s?tech|b\.?\s?e\b|b\.?\s?sc|b\.?\s?ca|b\.?\s?com|m\.?\s?tech|m\.?\s?sc|mca|mba|bachelor|master'?s?|diploma|universit|college|institute|school|cgpa|gpa|percentage|sgpa|12th|10th|hsc|ssc|cbse|icse|graduat)/i,
+    experience: /\b(intern(ship)?|trainee|work experience|employment|worked (as|at|with)|freelanc|volunteer|apprentice|developer at|engineer at|analyst at|full[- ]time|part[- ]time)\b/i,
+    projects: /\bprojects?\b|\b(built|developed|designed|implemented|created) (a|an|the)\b/i,
+    certifications: /\b(certif|coursera|udemy|nptel|edx|udacity|hackerrank|workshop|course completion|completed (the )?course)/i,
+    summary: /\b(objective|summary|seeking|aspiring|passionate|motivated|looking for|eager to|dedicated|enthusiastic)\b/i,
+  };
+  async function defaultAnalyzer(text) {
+    text = text.replace(/\b(?:[A-Za-z] ){3,}[A-Za-z]\b/g, m => m.replace(/ /g, ''));
+    const skills = {};
+    MATCHERS.forEach(([cat, items]) => { const hit = items.filter(([, r]) => r.test(text)).map(([n]) => n); if (hit.length) skills[cat] = hit; });
+    const lines = text.split(/\n/).map(l => l.replace(/^[^A-Za-z]+/, '').trim()).filter(Boolean);
+    const sections = {};
+    Object.entries(SECTIONS).forEach(([k, [, r]]) => sections[k] = lines.some(l => r.test(l)) || CAPS[k].test(text) || (CONTENT[k] || /$^/).test(text));
+    const contact = { email: /[\w.+-]+\s*@\s*[\w-]+(\s*\.\s*[\w-]+)+/.test(text), phone: /\+?\d[\d\s\-().]{8,}\d/.test(text), linkedin: /linkedin\.com/i.test(text), github: /github\.com/i.test(text) };
+    return { wordCount: (text.match(/\S+/g) || []).length, skills, sections, contact };
+  }
+
+  const loaded = {};
+  const loadScript = src => loaded[src] || (loaded[src] = new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('load ' + src)); document.head.appendChild(s); }));
+  async function extract(file, ext) {
+    if (ext === 'txt') return file.text();
+    const buf = await file.arrayBuffer();
+    if (ext === 'docx') {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+      return (await mammoth.extractRawText({ arrayBuffer: buf })).value;
+    }
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let out = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const c = await (await pdf.getPage(i)).getTextContent(), rows = {};
+      c.items.forEach(t => { if (!t.str.trim()) return; const y = Math.round(t.transform[5] / 3); (rows[y] = rows[y] || []).push(t); });
+      out += Object.keys(rows).map(Number).sort((a, b) => b - a)
+        .map(y => rows[y].sort((a, b) => a.transform[4] - b.transform[4]).map(t => t.str).join(' ')).join('\n') + '\n';
+    }
+    return out;
+  }
+
+  /* ---------- UI ---------- */
+  const drop = (err = '') => `<label class="drop" id="drop" for="ra-file"><span class="stat-ico"><i data-lucide="file-up" class="i"></i></span><strong>Drop your resume here, or click to browse</strong><small>PDF, DOCX or TXT, up to 5 MB</small><input type="file" id="ra-file" accept=".pdf,.docx,.txt" hidden></label>
+    ${err ? `<p class="ra-err" role="alert">${esc(err)}</p>` : ''}<p class="ra-note"><i data-lucide="lock" class="i"></i>Your file is read in your browser and isn't uploaded. Only the extracted skills and checklist are saved.</p>`;
+  const busy = msg => `<div class="card panel ra-busy" role="status"><span class="spin"></span><div><strong>${esc(msg)}</strong><p class="sec-sub">This usually takes a few seconds.</p></div></div>`;
+  const tick = (ok, label) => `<div class="check${ok ? ' done' : ''}"><b><i data-lucide="${ok ? 'check-circle-2' : 'circle-dashed'}" class="i"></i>${esc(label)}</b><span>${ok ? 'Found' : 'Not found'}</span></div>`;
+
+  function result(r) {
+    const cats = Object.keys(r.skills || {});
+    const total = cats.reduce((n, c) => n + r.skills[c].length, 0);
+    const skills = total ? cats.map(c => `<div class="skillgroup"><h3>${esc(c)}</h3><div class="chips">${r.skills[c].map(s => `<span class="chip">${esc(s)}</span>`).join('')}</div></div>`).join('')
+      : `<div class="empty"><p>We didn't recognize any skills from our list. Add a clear Skills section with the tools and languages you use, then analyze again.</p></div>`;
+    const when = new Date(r.analyzedAt).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+    const C = r.contact || {};
+    return `<section class="card panel"><div class="panel-head" style="margin:0"><div class="stat" style="padding:0"><div class="stat-ico ok"><i data-lucide="file-check" class="i"></i></div><div><div class="val" style="font-size:17px">${esc(r.fileName)}</div><p>Analyzed ${when} · ${r.wordCount} words · ${total} skills found</p></div></div>
+      <div style="display:flex;gap:8px"><button class="btn" data-ra="replace"><i data-lucide="refresh-cw" class="i"></i>Analyze another</button><button class="btn" data-ra="remove"><i data-lucide="trash-2" class="i"></i>Remove</button></div></div></section>
+      <div class="grid2 ra-grid"><section class="card panel"><div class="panel-head"><div><h2>Skills found</h2><p class="sec-sub">Grouped by category.</p></div></div>${skills}</section>
+      <section class="card panel"><div class="panel-head"><div><h2>Resume checklist</h2><p class="sec-sub">Sections and contact details we detected.</p></div></div>
+      <div class="checks two">${Object.entries(SECTIONS).map(([k, [l]]) => tick(r.sections?.[k], l)).join('')}${tick(C.email, 'Email')}${tick(C.phone, 'Phone')}${tick(C.linkedin, 'LinkedIn')}${tick(C.github, 'GitHub')}</div></section></div>
+      <p class="ra-note"><i data-lucide="info" class="i"></i>Skills are matched against a built-in list. Sections are detected by their headings or by the content they contain. AI-powered analysis will replace this later.</p>
+      ${api.lastText ? `<details class="ra-dbg"><summary>What we read from your file</summary><pre class="ra-pre">${esc(api.lastText.slice(0, 2500))}</pre></details>` : ''}
+      <input type="file" id="ra-file" accept=".pdf,.docx,.txt" hidden>`;
+  }
+
+  const view = () => { const r = storage.get('resume'); return `<div><h1>Resume analyzer</h1><p class="sub">Upload your resume to discover your professional strengths.</p></div><div id="ra-body">${r ? result(r) : drop()}</div>`; };
+
+  function fail(msg) { toast(msg, 'error'); $('#ra-body').innerHTML = drop(msg); icons(); bind(); }
+  async function handle(file) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!['pdf', 'docx', 'txt'].includes(ext)) return fail('Upload a PDF, DOCX or TXT file.');
+    if (file.size > MAX) return fail('That file is over 5 MB. Upload a smaller version.');
+    $('#ra-body').innerHTML = busy('Reading your resume…'); icons();
+    try {
+      const text = await extract(file, ext);
+      if (text.trim().length < 50) return fail('We couldn’t find text in that file. If it’s a scanned image, export a text-based PDF instead.');
+      api.lastText = text;
+      $('#ra-body strong').textContent = 'Finding your skills…';
+      const res = await api.analyzer(text, file);
+      NexPath.setResume({ fileName: file.name, analyzedAt: new Date().toISOString(), ...res });
+      toast('Resume analyzed.', 'success');
+    } catch (e) { console.error(e); fail('We couldn’t read that file. Check your connection and try again, or upload a different format.'); }
+  }
+  function bind() {
+    const input = $('#ra-file'), z = $('#drop');
+    if (input) input.onchange = () => input.files[0] && handle(input.files[0]);
+    if (z) {
+      ['dragenter', 'dragover'].forEach(t => z.addEventListener(t, e => { e.preventDefault(); z.classList.add('over'); }));
+      ['dragleave', 'drop'].forEach(t => z.addEventListener(t, e => { e.preventDefault(); z.classList.remove('over'); }));
+      z.addEventListener('drop', e => e.dataTransfer.files[0] && handle(e.dataTransfer.files[0]));
+    }
+    document.querySelectorAll('[data-ra]').forEach(b => b.onclick = () => {
+      if (b.dataset.ra === 'replace') return input.click();
+      const name = (storage.get('resume') || {}).fileName;
+      storage.set('resume', null); NexPath.logActivity('resume', `Removed resume “${name}”`); toast('Resume removed.', 'success');
+    });
+  }
+  const api = { analyzer: defaultAnalyzer, view, bind };
+  return api;
+})();
+
+</script>
+<script>
+/* Phase 2 — Skill Analysis (rule-based). Compares resume skills with a built-in reference list per role.
+   Replace ROLES / compute() with a backend call later; the view only needs { have, miss } for core and nice. */
+NexPath.skillAnalysis = (() => {
+  const { storage, esc } = NexPath;
+  const $ = s => document.querySelector(s);
+  const ROLES = {
+    'Full-stack developer': { match: /./, core: ['HTML', 'CSS', 'JavaScript', 'React', 'Node.js', 'SQL', 'REST API', 'Git'], nice: ['TypeScript', 'MongoDB', 'PostgreSQL', 'Docker', 'AWS', 'Agile', 'Communication'] },
+    'Frontend developer': { match: /front/i, core: ['HTML', 'CSS', 'JavaScript', 'React', 'Git', 'REST API'], nice: ['TypeScript', 'Tailwind CSS', 'Redux', 'Next.js', 'Figma', 'Communication'] },
+    'Backend developer': { match: /back/i, core: ['Node.js', 'SQL', 'REST API', 'PostgreSQL', 'Git', 'Docker'], nice: ['Redis', 'MongoDB', 'AWS', 'Kubernetes', 'CI/CD', 'Linux'] },
+    'Data analyst': { match: /analy/i, core: ['Python', 'SQL', 'Excel', 'Pandas', 'Data Analysis', 'Data Visualization', 'Statistics'], nice: ['Tableau', 'Power BI', 'NumPy', 'Matplotlib', 'Communication'] },
+    'Data scientist / ML engineer': { match: /scien|machine|\bml\b|\bai\b/i, core: ['Python', 'Machine Learning', 'Pandas', 'NumPy', 'Scikit-learn', 'Statistics', 'SQL'], nice: ['Deep Learning', 'TensorFlow', 'PyTorch', 'NLP', 'Computer Vision', 'Docker', 'AWS'] },
+    'DevOps / cloud engineer': { match: /devops|cloud|sre/i, core: ['Linux', 'Git', 'Docker', 'Kubernetes', 'AWS', 'CI/CD'], nice: ['Terraform', 'Jenkins', 'Azure', 'Google Cloud', 'Python'] },
+  };
+  const NAMES = Object.keys(ROLES);
+  const detect = role => NAMES.slice(1).concat(NAMES[0]).find(n => ROLES[n].match.test(role || '')) || NAMES[0];
+  const currentRole = () => { const s = storage.get('skillRole'); return ROLES[s] ? s : detect(NexPath.profile.get().role); };
+
+  function compute(name) {
+    const r = storage.get('resume') || {};
+    const mine = Object.values(r.skills || {}).flat(), set = new Set(mine.map(s => s.toLowerCase()));
+    const split = list => ({ have: list.filter(s => set.has(s.toLowerCase())), miss: list.filter(s => !set.has(s.toLowerCase())) });
+    const core = split(ROLES[name].core), nice = split(ROLES[name].nice);
+    const listed = new Set([...ROLES[name].core, ...ROLES[name].nice].map(s => s.toLowerCase()));
+    return { core, nice, extra: mine.filter(s => !listed.has(s.toLowerCase())), pct: Math.round(core.have.length / ROLES[name].core.length * 100) };
+  }
+  /* Keeps the Career Match card on the overview in step with this analysis. */
+  function sync() {
+    const r = storage.get('resume'), m = storage.get('match');
+    if (!r) { if (m) storage.set('match', null); return; }
+    const role = currentRole(), res = compute(role);
+    if (!m || m.score !== res.pct || m.role !== role) storage.set('match', { score: res.pct, role, basis: 'Core skill coverage' });
+  }
+
+  const chips = (a, cls) => a.length ? `<div class="chips">${a.map(s => `<span class="chip ${cls}">${esc(s)}</span>`).join('')}</div>` : '';
+  const group = (title, g) => `<div class="skillgroup"><h3>${title}</h3>${chips(g.have, 'have') + chips(g.miss, 'miss') || '<p class="sec-sub">None listed.</p>'}</div>`;
+
+  function view() {
+    const head = `<div><h1>Skill analysis</h1><p class="sub">See how your skills line up with the role you're aiming for.</p></div>`;
+    if (!storage.get('resume')) return head + `<div class="card panel"><div class="empty"><div class="stat-ico"><i data-lucide="radar" class="i"></i></div><p>Analyze your resume first. We'll compare the skills we find with your target role.</p><button class="btn btn-primary" data-go="resume"><i data-lucide="file-up" class="i"></i>Analyze resume</button></div></div>`;
+    const role = currentRole(), x = compute(role), target = NexPath.profile.get().role;
+    const note = target && detect(target) === role && !storage.get('skillRole') ? `Matched to your target role “${esc(target)}”.` : '';
+    const next = x.core.miss.slice(0, 3);
+    return head + `<section class="card panel"><div class="panel-head"><div><h2>Compare against</h2><p class="sec-sub">${note || 'Pick the role you want to compare with.'}</p></div>
+      <select class="sel" id="sa-role" aria-label="Target role">${NAMES.map(n => `<option${n === role ? ' selected' : ''}>${n}</option>`).join('')}</select></div>
+      <div class="pct"><strong>${x.pct}%</strong><div class="bar" role="progressbar" aria-valuenow="${x.pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${x.pct}%"></i></div></div>
+      <p class="sec-sub">You have ${x.core.have.length} of ${ROLES[role].core.length} core skills for this role.</p></section>
+      <div class="grid2 ra-grid"><section class="card panel"><h2 style="margin-bottom:14px">Core skills</h2>${group('Have and missing', x.core)}</section>
+      <section class="card panel"><h2 style="margin-bottom:14px">Nice to have</h2>${group('Have and missing', x.nice)}</section></div>
+      <section class="card panel"><h2>What to learn next</h2>${next.length ? `<ol class="next">${next.map(s => `<li><b>${esc(s)}</b><span>Core skill for ${esc(role.toLowerCase())}s, missing from your resume.</span></li>`).join('')}</ol>` : `<p class="sec-sub" style="margin-top:6px">You cover every core skill on our list. Look at the nice-to-have skills next.</p>`}
+      ${x.extra.length ? `<h3 class="sa-h">Other skills on your resume</h3>${chips(x.extra, '')}` : ''}</section>
+      <p class="ra-note"><i data-lucide="info" class="i"></i>Based on a built-in reference list for each role, not live job-market data. Missing means we didn't find it on your resume, so add it there if you have it.</p>`;
+  }
+  function bind() {
+    const sel = $('#sa-role'); if (!sel) return;
+    sel.onchange = () => { storage.set('skillRole', sel.value); NexPath.logActivity('analysis', `Compared your skills with ${sel.value}`); };
+  }
+  return { view, bind, sync, compute, currentRole, names: NAMES };
+})();
+
+</script>
+<script>
+/* Phase 3 — Career Roadmap (rule-based). Builds staged steps from the Skill Analysis gaps.
+   Progress is real: completed steps / total steps, saved per role. Swap build() for a backend/AI planner later. */
+NexPath.roadmap = (() => {
+  const { storage, esc } = NexPath;
+  const SA = () => NexPath.skillAnalysis;
+  const PROJECT = {
+    'Full-stack developer': 'Build a task-tracker app with sign-in, a REST API and a database.',
+    'Frontend developer': 'Rebuild a real landing page as a responsive React app with interactive features.',
+    'Backend developer': 'Build and document a REST API with authentication and a PostgreSQL database.',
+    'Data analyst': 'Pick a public dataset, clean it, analyze it and present your findings in a dashboard.',
+    'Data scientist / ML engineer': 'Train and evaluate a model on a public dataset, then write up your method and results.',
+    'DevOps / cloud engineer': 'Containerize an app and deploy it with an automated CI/CD pipeline.',
+  };
+  const chunk = (a, n) => a.length ? [a.slice(0, n), ...chunk(a.slice(n), n)] : [];
+
+  function build(role) {
+    const x = SA().compute(role), stages = [];
+    const all = chunk(x.core.miss, 3);
+    all.forEach((g, i) => stages.push({ title: 'Close core gaps' + (all.length > 1 ? ` · part ${i + 1}` : ''), desc: 'Core skills for this role that we didn’t find on your resume.',
+      steps: g.map(s => ({ id: 'skill-' + s, title: `Learn ${s}`, detail: 'Cover the fundamentals, then use it in a small hands-on exercise.', skill: s })) }));
+    stages.push({ title: 'Build proof', desc: 'A project shows employers you can apply your skills.', steps: [{ id: 'project', title: 'Build a portfolio project', detail: PROJECT[role] || PROJECT['Full-stack developer'] }] });
+    if (x.nice.miss.length) stages.push({ title: 'Stand out', desc: 'Nice-to-have skills that set you apart.', steps: x.nice.miss.slice(0, 4).map(s => ({ id: 'nice-' + s, title: `Pick up ${s}`, detail: 'Learn the basics and use it in your project.', skill: s })) });
+    stages.push({ title: 'Get job-ready', desc: 'Put it all together.', steps: [
+      { id: 'resume', title: 'Update and re-analyze your resume', detail: 'Add new skills and project links, then run the Resume Analyzer again.', go: 'resume', goLabel: 'Open Resume Analyzer' },
+      { id: 'links', title: 'Publish your work', detail: 'Put your project on GitHub and link it from your resume and LinkedIn.' },
+      { id: 'interview', title: 'Practice interview questions', detail: 'Run a mock interview for this role and get feedback on each answer.', go: 'interview', goLabel: 'Start mock interview' }] });
+    return { x, stages };
+  }
+
+  function view() {
+    const head = `<div><h1>Career roadmap</h1><p class="sub">A step-by-step plan to close your skill gaps.</p></div>`;
+    if (!storage.get('resume')) return head + `<div class="card panel"><div class="empty"><div class="stat-ico"><i data-lucide="route" class="i"></i></div><p>Analyze your resume first. Your roadmap is built from the skills you already have and the ones your target role needs.</p><button class="btn btn-primary" data-go="resume"><i data-lucide="file-up" class="i"></i>Analyze resume</button></div></div>`;
+    const role = SA().currentRole(), { x, stages } = build(role), done = storage.get('roadmapDone', {});
+    const steps = stages.flatMap(s => s.steps), n = steps.filter(s => done[role + '|' + s.id]).length, pct = Math.round(n / steps.length * 100);
+    let num = 0;
+    return head + `<section class="card panel"><div class="panel-head"><div><h2>Roadmap for ${esc(role.toLowerCase())}</h2><p class="sec-sub">You already have ${x.core.have.length} core skill${x.core.have.length === 1 ? '' : 's'} for this role.</p></div><button class="btn" data-go="skills"><i data-lucide="repeat" class="i"></i>Change role</button></div>
+      <div class="pct"><strong>${pct}%</strong><div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div><p class="sec-sub">${n} of ${steps.length} steps completed.</p></section>
+      ${stages.map(st => `<section class="card panel rm-stage"><div class="rm-head"><span class="rm-num">${++num}</span><div><h2>${esc(st.title)}</h2><p class="sec-sub">${esc(st.desc)}</p></div></div><ul class="rm-steps">${st.steps.map(s => { const on = !!done[role + '|' + s.id]; return `<li class="${on ? 'on' : ''}"><button class="tick" role="checkbox" aria-checked="${on}" aria-label="Mark “${esc(s.title)}” as done" data-rm="${esc(s.id)}" data-title="${esc(s.title)}"><i data-lucide="check" class="i"></i></button><div><b>${esc(s.title)}</b><p>${esc(s.detail)}</p>${s.skill ? `<a class="link" href="https://www.youtube.com/results?search_query=${encodeURIComponent(s.skill + ' tutorial for beginners')}" target="_blank" rel="noopener">Find tutorials ↗</a>` : ''}${s.go ? `<button class="link" data-go="${s.go}">${esc(s.goLabel || 'Open')}</button>` : ''}</div></li>`; }).join('')}</ul></section>`).join('')}
+      <p class="ra-note"><i data-lucide="info" class="i"></i>This plan is generated from your skill gaps using built-in rules. Tutorial links are searches, not endorsements. AI-personalized roadmaps will come later.</p>`;
+  }
+  function bind() {
+    document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => {
+      const k = SA().currentRole() + '|' + b.dataset.rm, d = storage.get('roadmapDone', {});
+      if (d[k]) delete d[k]; else d[k] = true;
+      storage.set('roadmapDone', d);
+      d[k] ? NexPath.logActivity('goal', `Completed roadmap step: ${b.dataset.title}`) : NexPath.emit('change');
+    });
+  }
+  return { view, bind, build };
+})();
+
+</script>
+<script>
+/* AI layer + shared chat UI + Settings page.
+   NexPath.ai.chat() is the ONLY function that talks to a model. Two modes:
+   1) Direct (prototype): user's Anthropic API key, called from the browser.
+   2) Backend (recommended for production): POST {system,messages,model,max_tokens} to your URL, reply {text}.
+   Swap or extend chat() when you add a real backend. */
+NexPath.ai = (() => {
+  const { storage, esc, toast } = NexPath;
+  const $ = s => document.querySelector(s);
+  const DEFAULT_MODEL = 'claude-sonnet-5-5';
+  const cfg = () => ({ key: '', model: DEFAULT_MODEL, proxy: '', ...storage.get('ai', {}) });
+  const configured = () => { const c = cfg(); return !!(c.key || c.proxy); };
+
+  async function chat({ system, messages, max_tokens = 1000 }) {
+    const c = cfg(); let res;
+    try {
+      res = c.proxy
+        ? await fetch(c.proxy, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ system, messages, model: c.model, max_tokens }) })
+        : await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': c.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: c.model, max_tokens, system, messages }) });
+    } catch { throw new Error('Couldn’t reach the AI service. Check your connection and your Settings.'); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const m = data.error?.message || (typeof data.error === 'string' ? data.error : '');
+      throw new Error(res.status === 401 ? 'The API key was rejected. Check it in Settings.' : res.status === 429 ? 'Too many requests right now. Wait a moment and try again.' : 'The AI service returned an error' + (m ? ': ' + m.slice(0, 160) : '.'));
+    }
+    const text = data.text ?? (data.content || []).map(b => b.text || '').join('');
+    if (!String(text).trim()) throw new Error('The AI service returned an empty reply.');
+    return String(text).trim();
+  }
+
+  /* What the model is told about the student: profile + extracted skills + gaps. Never the raw resume text. */
+  function context() {
+    const p = NexPath.profile.get(), r = storage.get('resume'), L = [];
+    if (p.name) L.push('Name: ' + p.name);
+    const edu = [p.degree, p.branch].filter(Boolean).join(' in ');
+    if (edu || p.college) L.push(`Education: ${edu}${p.college ? ' at ' + p.college : ''}${p.year ? ', ' + p.year : ''}${p.gradYear ? ', graduating ' + p.gradYear : ''}`);
+    if (p.interests) L.push('Career interests: ' + p.interests);
+    if (p.role) L.push('Target role: ' + p.role);
+    if (r) {
+      Object.entries(r.skills || {}).forEach(([c, s]) => L.push(`Skills (${c}): ${s.join(', ')}`));
+      const role = NexPath.skillAnalysis.currentRole(), x = NexPath.skillAnalysis.compute(role);
+      L.push(`Compared against: ${role}`, `Core skills present: ${x.core.have.join(', ') || 'none'}`, `Core skills missing: ${x.core.miss.join(', ') || 'none'}`);
+    } else L.push('Resume: not analyzed yet.');
+    return L.join('\n') || 'No profile information yet.';
+  }
+
+  /* ---- shared chat UI helpers ---- */
+  const md = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^(?:- |\* |• )(.+)$/gm, '<li>$1</li>').replace(/(?:<li>.*<\/li>\n?)+/g, m => '<ul>' + m.replace(/\n/g, '') + '</ul>').replace(/\n/g, '<br>');
+  const bubble = m => m.hidden ? '' : `<div class="msg ${m.role === 'user' ? 'user' : 'ai'}">${md(m.content)}</div>`;
+  const typing = '<div class="msg ai typing" role="status" aria-label="Thinking"><i></i><i></i><i></i></div>';
+  const errBox = (msg, attr) => `<div class="msg ai err"><p>${esc(msg)}</p><button class="btn" ${attr}>Try again</button></div>`;
+  const composer = (id, ph, off) => `<div class="composer"><textarea id="${id}" rows="1" placeholder="${ph}" aria-label="${ph}" ${off ? 'disabled' : ''}></textarea><button class="btn btn-primary" id="${id}-send" aria-label="Send" ${off ? 'disabled' : ''}><i data-lucide="send" class="i"></i></button></div>`;
+  function wire(id, onSend) {
+    const t = $('#' + id), b = $('#' + id + '-send'); if (!t || t.disabled) return;
+    const go = () => { const v = t.value.trim(); if (v) { t.value = ''; onSend(v); } };
+    b.onclick = go;
+    t.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); go(); } };
+    t.oninput = () => { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 120) + 'px'; };
+    t.focus({ preventScroll: true });
+  }
+  const scroll = () => { const l = $('.chat-log'); if (l) l.scrollTop = l.scrollHeight; };
+  const notice = what => `<div class="card panel"><div class="empty"><div class="stat-ico"><i data-lucide="plug-zap" class="i"></i></div><p>Connect an AI model in Settings to use ${what}.</p><button class="btn btn-primary" data-go="settings"><i data-lucide="settings" class="i"></i>Open Settings</button></div></div>`;
+
+  /* ---- Settings page ---- */
+  function settingsView() {
+    const c = cfg();
+    return `<section class="card panel"><div class="panel-head"><div><h2>AI connection</h2><p class="sec-sub">Powers the AI Career Mentor and the Mock Interviewer.</p></div><span class="chip ${configured() ? 'have' : ''}">${configured() ? 'Connected' : 'Not connected'}</span></div>
+    <div class="form"><div class="field wide"><label for="ai-key">Anthropic API key</label><input id="ai-key" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(c.key)}"><small>Saved in this browser only and sent only to Anthropic.</small></div>
+    <div class="field"><label for="ai-model">Model</label><input id="ai-model" value="${esc(c.model)}"></div>
+    <div class="field"><label for="ai-proxy">Backend URL (optional)</label><input id="ai-proxy" placeholder="https://your-server/api/chat" value="${esc(c.proxy)}"><small>If set, requests go here instead, and no key is needed.</small></div></div>
+    <div class="modal-foot" style="justify-content:flex-start"><button class="btn btn-primary" id="ai-save">Save and test</button><button class="btn" id="ai-clear">Disconnect</button></div></section>
+    <p class="ra-note"><i data-lucide="shield-alert" class="i"></i>Keeping a key in the browser is fine for a personal prototype, but not for a public product. Before launch, use a backend URL so keys never reach the browser. Your profile summary and extracted skills (not your resume file) are sent with each message.</p>`;
+  }
+  function settingsBind() {
+    const save = $('#ai-save'); if (!save) return;
+    save.onclick = async () => {
+      storage.set('ai', { key: $('#ai-key').value.trim(), model: $('#ai-model').value.trim() || DEFAULT_MODEL, proxy: $('#ai-proxy').value.trim() });
+      if (!configured()) return toast('Add an API key or a backend URL first.', 'error');
+      save.disabled = true; save.textContent = 'Testing…';
+      try { await chat({ system: 'Reply with the single word OK.', messages: [{ role: 'user', content: 'Test' }], max_tokens: 10 }); toast('Connected. AI features are ready.', 'success'); }
+      catch (e) { toast(e.message, 'error'); }
+      NexPath.emit('change');
+    };
+    $('#ai-clear').onclick = () => { storage.set('ai', {}); toast('AI connection removed.', 'success'); NexPath.emit('change'); };
+  }
+  return { chat, configured, context, md, bubble, typing, errBox, composer, wire, scroll, notice, settingsView, settingsBind };
+})();
+
+</script>
+<script>
+/* Phase 5 — AI Career Mentor. Chat history is saved locally (last 60 messages). */
+NexPath.mentor = (() => {
+  const { storage } = NexPath, ai = NexPath.ai, $ = s => document.querySelector(s);
+  const SYSTEM = `You are NexPath's AI Career Mentor, guiding a student or early-career learner. Use the student context below to give specific, practical advice about skills, resumes, projects, learning order, and career choices.
+Rules: be warm and concise (under 180 words unless asked for more). Prefer short paragraphs or bullet lists. Never invent statistics, salaries, job-market data, company facts or guarantees; if you are unsure, say so. If context is missing, say what's missing and suggest which NexPath tool to use (Resume Analyzer, Skill Analysis, Career Roadmap, Mock Interviewer). Do not claim to have seen the student's resume file; you only have the summary below.`;
+  const SUGGEST = ['What should I focus on first?', 'How can I improve my resume?', 'Explain my skill gaps', 'What projects should I build?'];
+  let busy = false, err = '';
+  const load = () => storage.get('mentorChat', []);
+  const save = c => storage.set('mentorChat', c.slice(-60));
+
+  function view() {
+    const head = `<div><h1>AI career mentor</h1><p class="sub">Personal guidance based on your profile and skills.</p></div>`;
+    if (!ai.configured()) return head + ai.notice('the AI Career Mentor');
+    const chat = load(), pending = chat.length && chat[chat.length - 1].role === 'user';
+    const intro = `<div class="msg ai">Hi${NexPath.profile.get().name ? ' ' + NexPath.esc(NexPath.profile.get().name.split(' ')[0]) : ''}! I can see your profile and skill analysis. Ask me anything about your career.</div><div class="sugg">${SUGGEST.map(s => `<button data-sg="${NexPath.esc(s)}">${s}</button>`).join('')}</div>`;
+    return head + `<section class="card chat"><div class="chat-log" id="m-log" aria-live="polite">${chat.length ? chat.map(ai.bubble).join('') : intro}${pending ? (err ? ai.errBox(err, 'data-mt="retry"') : ai.typing) : ''}</div>${ai.composer('m-in', 'Ask about your career…', pending && !err)}</section>
+      ${chat.length ? '<div><button class="btn" data-mt="clear"><i data-lucide="eraser" class="i"></i>Clear conversation</button></div>' : ''}`;
+  }
+  function send(text) { const c = load(); c.push({ role: 'user', content: text }); save(c); err = ''; NexPath.emit('change'); }
+  async function run() {
+    const chat = load(); if (busy || !chat.length || chat[chat.length - 1].role !== 'user') return;
+    busy = true; err = '';
+    try {
+      const msgs = chat.slice(-20); while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+      const reply = await ai.chat({ system: SYSTEM + '\n\nStudent context:\n' + ai.context(), messages: msgs.map(({ role, content }) => ({ role, content })) });
+      chat.push({ role: 'assistant', content: reply }); save(chat);
+    } catch (e) { err = e.message; }
+    busy = false; NexPath.emit('change');
+  }
+  function bind() {
+    if (!$('#m-log')) return;
+    ai.wire('m-in', send); ai.scroll();
+    document.querySelectorAll('[data-sg]').forEach(b => b.onclick = () => send(b.dataset.sg));
+    document.querySelectorAll('[data-mt]').forEach(b => b.onclick = () => { if (b.dataset.mt === 'retry') { err = ''; run(); NexPath.emit('change'); } else { save([]); err = ''; NexPath.emit('change'); } });
+    const c = load(); if (c.length && c[c.length - 1].role === 'user' && !err) run();
+  }
+  return { view, bind };
+})();
+
+</script>
+<script>
+/* Phase 4 — AI Mock Interviewer. State lives in storage ('interview'); the view always renders from it. */
+NexPath.interview = (() => {
+  const { storage, esc } = NexPath, ai = NexPath.ai, $ = s => document.querySelector(s);
+  const TYPES = ['Technical', 'Behavioral', 'Mixed'];
+  let busy = false, err = '';
+  const get = () => storage.get('interview'), set = s => storage.set('interview', s);
+  const sys = s => `You are a professional interviewer running a ${s.type.toLowerCase()} mock interview for a "${s.role}" position with a student or fresher.
+Rules: ask exactly ONE question at a time. After each candidate answer, give 2-3 sentences of specific, honest feedback (what worked, what to improve), then ask the next question starting with "**Question k of ${s.n}:**". Do not give numeric scores. Keep each reply under 150 words. Tailor questions to the candidate's skills when relevant, and keep difficulty suitable for a beginner. Notes in square brackets come from the system, not the candidate; follow them. At the end give a closing summary with **Strengths**, **Areas to improve** and **3 next steps**. Never invent facts about the candidate.
+Candidate context:\n${ai.context()}`;
+
+  function view() {
+    const head = `<div><h1>Mock interviewer</h1><p class="sub">Practice with an AI interviewer and get feedback on every answer.</p></div>`;
+    if (!ai.configured()) return head + ai.notice('the Mock Interviewer');
+    const s = get();
+    if (!s) {
+      const roles = NexPath.skillAnalysis.names, cur = NexPath.skillAnalysis.currentRole();
+      return head + `<section class="card panel"><h2>Set up your interview</h2><p class="sec-sub">Choose a role and style. Answer in your own words, as you would in a real interview.</p>
+        <div class="form" style="margin-top:18px"><div class="field wide"><label for="iv-role">Role</label><select class="sel" id="iv-role" style="width:100%">${roles.map(r => `<option${r === cur ? ' selected' : ''}>${r}</option>`).join('')}</select></div>
+        <div class="field"><label for="iv-type">Interview type</label><select class="sel" id="iv-type" style="width:100%">${TYPES.map(t => `<option>${t}</option>`).join('')}</select></div>
+        <div class="field"><label for="iv-n">Number of questions</label><select class="sel" id="iv-n" style="width:100%"><option>3</option><option selected>5</option><option>7</option></select></div></div>
+        <div class="modal-foot" style="justify-content:flex-start"><button class="btn btn-primary" id="iv-start"><i data-lucide="mic" class="i"></i>Start interview</button></div></section>`;
+    }
+    const last = s.messages[s.messages.length - 1], pending = last.role === 'user' && !s.done, pct = Math.round(Math.min(s.answers, s.n) / s.n * 100);
+    return head + `<section class="card panel"><div class="panel-head" style="margin:0"><div><h2>${esc(s.role)} · ${esc(s.type)}</h2><p class="sec-sub">${s.done ? 'Interview complete.' : `Answered ${s.answers} of ${s.n} questions.`}</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${!s.done ? `<button class="btn" data-iv="end" ${s.answers < 1 || pending ? 'disabled' : ''}>End and get summary</button>` : ''}<button class="btn" data-iv="new">${s.done ? 'New interview' : 'Cancel'}</button></div></div>
+      <div class="bar" style="margin-top:14px"><i style="width:${s.done ? 100 : pct}%"></i></div></section>
+      <section class="card chat"><div class="chat-log" id="iv-log" aria-live="polite">${s.messages.map(ai.bubble).join('')}${pending ? (err ? ai.errBox(err, 'data-iv="retry"') : ai.typing) : ''}</div>${s.done ? '' : ai.composer('iv-in', 'Type your answer…', pending)}</section>`;
+  }
+  function note(s, txt) { return `\n\n[Note to interviewer: ${txt}]`; }
+  function answer(text) {
+    const s = get(); s.answers++; const fin = s.answers >= s.n;
+    s.messages.push({ role: 'user', content: text, extra: note(s, fin ? `this was answer ${s.n} of ${s.n}, the last. Do not ask another question. Give the closing summary now.` : `the candidate has answered ${s.answers} of ${s.n} questions.`) });
+    if (fin) s.finishing = true; err = ''; set(s); NexPath.emit('change');
+  }
+  async function run() {
+    const s = get(); if (busy || !s || s.done || s.messages[s.messages.length - 1].role !== 'user') return;
+    busy = true; err = '';
+    try {
+      const reply = await ai.chat({ system: sys(s), max_tokens: 1200, messages: s.messages.map(m => ({ role: m.role, content: m.content + (m.extra || '') })) });
+      s.messages.push({ role: 'assistant', content: reply });
+      if (s.finishing) { s.done = true; set(s); busy = false; return NexPath.logActivity('analysis', `Completed a mock interview for ${s.role}`); }
+      set(s);
+    } catch (e) { err = e.message; }
+    busy = false; NexPath.emit('change');
+  }
+  function bind() {
+    const start = $('#iv-start');
+    if (start) start.onclick = () => {
+      const n = +$('#iv-n').value;
+      set({ role: $('#iv-role').value, type: $('#iv-type').value, n, answers: 0, done: false, messages: [{ role: 'user', hidden: true, content: `Begin the interview now. Ask Question 1 of ${n}.` }] });
+      err = ''; NexPath.emit('change');
+    };
+    if (!$('#iv-log')) return;
+    ai.wire('iv-in', answer); ai.scroll();
+    document.querySelectorAll('[data-iv]').forEach(b => b.onclick = () => {
+      const s = get(), a = b.dataset.iv;
+      if (a === 'new') { storage.set('interview', null); err = ''; return NexPath.emit('change'); }
+      if (a === 'retry') { err = ''; run(); return NexPath.emit('change'); }
+      if (a === 'end') { s.messages.push({ role: 'user', hidden: true, content: 'Please end the interview now and give the closing summary based on my answers so far.' }); s.finishing = true; set(s); NexPath.emit('change'); }
+    });
+    const s = get(); if (s && !s.done && s.messages[s.messages.length - 1].role === 'user' && !err) run();
+  }
+  return { view, bind };
+})();
+
+</script>
+<script>
+/* Help & Support: searchable FAQ, real getting-started checklist, shortcuts, data export/delete.
+   To show a contact option, set SUPPORT_EMAIL; with it empty the contact card is hidden. */
+NexPath.help = (() => {
+  const { storage, esc, toast } = NexPath;
+  const SUPPORT_EMAIL = '';
+  const PREFIX = 'nexpath:';
+  const FAQ = [
+    ['How does the Resume Analyzer work?', 'It reads your PDF, DOCX or TXT file in your browser, then matches the text against a built-in list of skills and looks for common sections (Education, Projects, Skills and so on) and contact details. It is rule-based, not AI.'],
+    ['Is my resume uploaded anywhere?', 'No. The file is read on your device and never sent to a server. We save only the extracted skills, the checklist results and the word count. If you use the AI Mentor or Mock Interviewer, your profile summary and extracted skills are sent to the AI provider with each message, but not your resume file.'],
+    ['Why is a skill I have marked as missing?', 'Skill matching uses a built-in list of roughly 90 skills, so a skill outside that list won’t be found. Make sure it appears clearly in a Skills section of your resume, then analyze it again.'],
+    ['What does “core skill coverage” mean?', 'It is the share of a role’s core skills that we found on your resume, for example 4 of 7 is 57%. The core skills come from a built-in reference list for each role, not live job-market data. It is not a prediction of your chances of getting a job.'],
+    ['How is the Career Match card calculated?', 'It shows the same core skill coverage as the Skill Analysis page, for the role you selected there. It updates when you re-analyze your resume or change the role.'],
+    ['How do I change the role I’m compared with?', 'Open Skill Analysis and pick a role from the dropdown. By default NexPath uses the target role in your profile when it matches one of the built-in roles.'],
+    ['How does the Career Roadmap work?', 'It turns your missing core and nice-to-have skills into stages with steps you can tick off. When you re-analyze your resume and a skill now appears, that step drops out and your progress is recalculated.'],
+    ['How do I turn on the AI Career Mentor and Mock Interviewer?', 'Open Settings, paste an Anthropic API key (or a backend URL), and click “Save and test”. Both features show a prompt until a connection works.'],
+    ['The AI says it can’t connect or returns an error. What should I check?', 'Check that the key is correct and has credits, that you are online, and that the model name in Settings is valid. A “Too many requests” message means you should wait a moment and try again.'],
+    ['Where is my data stored?', 'In this browser only (local storage). Clearing your browser data, using a private window or switching devices means starting fresh. Use “Export my data” below to keep a copy.'],
+  ];
+  const act = () => storage.get('activity', []);
+  function steps() {
+    const done = Object.keys(storage.get('roadmapDone', {})).length > 0;
+    return [
+      ['Complete your profile', NexPath.profile.completion().pct === 100, 'profile'],
+      ['Analyze your resume', !!storage.get('resume'), 'resume'],
+      ['Connect an AI model', NexPath.ai.configured(), 'settings'],
+      ['Complete a roadmap step', done, 'roadmap'],
+      ['Finish a mock interview', act().some(a => a.text.startsWith('Completed a mock interview')), 'interview'],
+    ];
+  }
+  function view() {
+    const st = steps(), n = st.filter(s => s[1]).length;
+    return `<div><h1>Help &amp; support</h1><p class="sub">Answers, shortcuts and tools for managing your data.</p></div>
+    <section class="card panel"><div class="panel-head"><div><h2>Getting started</h2><p class="sec-sub">${n} of ${st.length} done. This list follows your real progress.</p></div></div>
+      <div class="checks two">${st.map(([t, d, go]) => `<div class="check${d ? ' done' : ''}"><b><i data-lucide="${d ? 'check-circle-2' : 'circle-dashed'}" class="i"></i>${t}</b>${d ? '<span>Done</span>' : `<button class="link" data-go="${go}">Go there</button>`}</div>`).join('')}</div></section>
+    <section class="card panel"><div class="panel-head"><div><h2>Frequently asked questions</h2></div><input class="sel" id="faq-q" type="search" placeholder="Search questions…" aria-label="Search questions" style="min-width:220px"></div>
+      <div id="faq">${FAQ.map(([q, a]) => `<details class="faq"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}</div>
+      <p class="sec-sub" id="faq-none" hidden style="margin-top:8px">No questions match your search.</p></section>
+    <div class="grid2 ra-grid"><section class="card panel"><h2>Your data</h2><p class="sec-sub" style="margin:4px 0 16px">Saved in this browser. Your API key is never included in exports.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-hp="export"><i data-lucide="download" class="i"></i>Export my data</button><button class="btn" data-hp="delete"><i data-lucide="trash-2" class="i"></i>Delete all data</button></div></section>
+    <section class="card panel"><h2>Shortcuts</h2><dl class="plist" style="margin-top:12px;grid-template-columns:1fr"><div><dt>Send a chat message</dt><dd>Enter (Shift+Enter for a new line)</dd></div><div><dt>Close dialogs, menus and the mobile menu</dt><dd>Esc</dd></div></dl></section></div>
+    ${SUPPORT_EMAIL ? `<section class="card panel"><h2>Contact us</h2><p class="sec-sub" style="margin:4px 0 16px">Can’t find what you need?</p><a class="btn btn-primary" href="mailto:${esc(SUPPORT_EMAIL)}?subject=NexPath%20support"><i data-lucide="mail" class="i"></i>Email support</a></section>` : ''}`;
+  }
+  function exportData() {
+    const out = {};
+    Object.keys(localStorage).filter(k => k.startsWith(PREFIX) && k !== PREFIX + 'ai').forEach(k => { try { out[k.slice(PREFIX.length)] = JSON.parse(localStorage.getItem(k)); } catch {} });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' }));
+    a.download = 'nexpath-data.json'; a.click(); URL.revokeObjectURL(a.href);
+    toast('Your data was downloaded.', 'success');
+  }
+  function bind() {
+    const q = document.getElementById('faq-q'); if (!q) return;
+    q.oninput = () => {
+      const t = q.value.trim().toLowerCase(); let shown = 0;
+      document.querySelectorAll('#faq .faq').forEach(d => { const hit = !t || d.textContent.toLowerCase().includes(t); d.hidden = !hit; if (hit) shown++; if (t && hit) d.open = true; });
+      document.getElementById('faq-none').hidden = shown > 0;
+    };
+    document.querySelectorAll('[data-hp]').forEach(b => b.onclick = () => {
+      if (b.dataset.hp === 'export') return exportData();
+      if (!confirm('Delete your profile, resume results, roadmap progress, chats and AI settings from this browser? This cannot be undone.')) return;
+      Object.keys(localStorage).filter(k => k.startsWith(PREFIX)).forEach(k => localStorage.removeItem(k));
+      toast('All saved data was deleted.', 'success'); NexPath.emit('change');
+    });
+  }
+  return { view, bind };
+})();
+
+</script>
+<script>
+/* Calendar / planner: assign tasks to dates. Saved under "tasks" in storage.
+   Task: { id, title, date:'YYYY-MM-DD', time, cat, notes, done, roadmapKey }. Completing a linked task ticks its roadmap step. */
+NexPath.calendar = (() => {
+  const { storage, esc, toast } = NexPath;
+  const $ = s => document.querySelector(s);
+  const CATS = ['Study', 'Project', 'Interview prep', 'Applications', 'Other'];
+  const pad = n => String(n).padStart(2, '0');
+  const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+  const now = new Date();
+  let cur = new Date(now.getFullYear(), now.getMonth(), 1), sel = ymd(now), editing = null;
+  const tasks = () => storage.get('tasks', []);
+  const save = t => storage.set('tasks', t);
+  const today = () => ymd(new Date());
+  const byTime = (a, b) => (a.time || '99:99').localeCompare(b.time || '99:99');
+
+  function due() { const t = today(), open = tasks().filter(x => !x.done); return { today: open.filter(x => x.date === t), overdue: open.filter(x => x.date < t) }; }
+
+  function view() {
+    const all = tasks(), t = today(), d = due(), y = cur.getFullYear(), m = cur.getMonth();
+    const offset = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate(), by = {};
+    all.forEach(x => (by[x.date] = by[x.date] || []).push(x));
+    let cells = '<span class="cal-blank"></span>'.repeat(offset);
+    for (let day = 1; day <= n; day++) {
+      const k = `${y}-${pad(m + 1)}-${pad(day)}`, l = by[k] || [];
+      cells += `<button class="cal-day${k === t ? ' today' : ''}${k === sel ? ' sel' : ''}" data-day="${k}" aria-pressed="${k === sel}" aria-label="${parse(k).toLocaleDateString(undefined, { day: 'numeric', month: 'long' })}, ${l.length} task${l.length === 1 ? '' : 's'}"><span>${day}</span><i class="dots">${l.slice(0, 3).map(x => `<b class="${x.done ? 'd' : ''}"></b>`).join('')}</i></button>`;
+    }
+    const list = (by[sel] || []).slice().sort(byTime);
+    const rows = list.map(x => `<li class="${x.done ? 'on' : ''}"><button class="tick" role="checkbox" aria-checked="${!!x.done}" aria-label="Mark “${esc(x.title)}” as done" data-tk="toggle" data-id="${x.id}"><i data-lucide="check" class="i"></i></button>
+      <div class="tk-main"><b>${esc(x.title)}</b>${!x.done && x.date < t ? ' <span class="tag-over">Overdue</span>' : ''}<p>${[x.time, x.cat].filter(Boolean).map(esc).join(' · ')}</p>${x.notes ? `<p>${esc(x.notes)}</p>` : ''}</div>
+      <div class="tk-act"><button class="icon-btn" data-tk="edit" data-id="${x.id}" aria-label="Edit task"><i data-lucide="pencil" class="i"></i></button><button class="icon-btn" data-tk="del" data-id="${x.id}" aria-label="Delete task"><i data-lucide="trash-2" class="i"></i></button></div></li>`).join('');
+    return `<div class="panel-head" style="margin:0"><div><h1>Calendar</h1><p class="sub">Plan your work and assign tasks to days.</p></div><button class="btn btn-primary" data-cal="add"><i data-lucide="plus" class="i"></i>Add task</button></div>
+    <div class="cal-stats"><div class="card"><small>Due today</small><b>${d.today.length}</b></div><div class="card"><small>Overdue</small><b class="${d.overdue.length ? 'warn' : ''}">${d.overdue.length}</b></div><div class="card"><small>Completed</small><b>${all.filter(x => x.done).length}</b></div></div>
+    <div class="cal-wrap"><section class="card panel"><div class="panel-head" style="margin-bottom:14px"><h2>${cur.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</h2>
+      <div style="display:flex;gap:6px;align-items:center"><button class="icon-btn" data-cal="prev" aria-label="Previous month"><i data-lucide="chevron-left" class="i"></i></button><button class="btn" data-cal="today">Today</button><button class="icon-btn" data-cal="next" aria-label="Next month"><i data-lucide="chevron-right" class="i"></i></button></div></div>
+      <div class="cal-grid">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(w => `<span class="cal-dow">${w}</span>`).join('')}${cells}</div></section>
+    <section class="card panel"><div class="panel-head" style="margin-bottom:6px"><div><h2>${parse(sel).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</h2><p class="sec-sub">${list.length ? `${list.length} task${list.length === 1 ? '' : 's'}` : 'Nothing planned yet.'}</p></div></div>
+      ${list.length ? `<ul class="tasks">${rows}</ul>` : `<div class="empty"><div class="stat-ico"><i data-lucide="calendar-plus" class="i"></i></div><p>Add a task to plan what you'll work on this day.</p></div>`}
+      <button class="btn" data-cal="add" style="margin-top:14px"><i data-lucide="plus" class="i"></i>Add task for this day</button></section></div>`;
+  }
+
+  /* ---- modal ---- */
+  function roadmapOptions(task) {
+    try {
+      if (!storage.get('resume')) return task?.roadmapKey ? [[task.roadmapKey, task.title]] : [];
+      const role = NexPath.skillAnalysis.currentRole(), done = storage.get('roadmapDone', {});
+      const o = NexPath.roadmap.build(role).stages.flatMap(s => s.steps).filter(s => !done[role + '|' + s.id]).map(s => [role + '|' + s.id, s.title]);
+      if (task?.roadmapKey && !o.some(x => x[0] === task.roadmapKey)) o.unshift([task.roadmapKey, task.title]);
+      return o;
+    } catch { return []; }
+  }
+  function ensureModal() {
+    if ($('#task-modal')) return;
+    document.body.insertAdjacentHTML('beforeend', `<div class="modal" id="task-modal" hidden><div class="modal-bg" data-tm-close></div><div class="modal-box card" role="dialog" aria-modal="true" aria-labelledby="tm-title"><div class="modal-head"><div><h2 id="tm-title"></h2><p>Plan your work on a specific day.</p></div><button class="icon-btn" data-tm-close aria-label="Close"><i data-lucide="x" class="i"></i></button></div><form id="tm-form" class="form" novalidate onsubmit="return false"></form><div class="modal-foot"><button class="btn" data-tm-close>Cancel</button><button class="btn btn-primary" id="tm-save">Save task</button></div></div></div>`);
+    document.querySelectorAll('[data-tm-close]').forEach(b => b.addEventListener('click', closeModal));
+    document.addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+    $('#tm-save').addEventListener('click', submit);
+  }
+  const closeModal = () => { const m = $('#task-modal'); if (m && !m.hidden) { m.hidden = true; document.body.classList.remove('lock'); } };
+  function openModal(task) {
+    ensureModal(); editing = task?.id || null;
+    const v = task || { date: sel }, opts = roadmapOptions(task);
+    $('#tm-title').textContent = editing ? 'Edit task' : 'Add task';
+    $('#tm-form').innerHTML = `<div class="field wide"><label for="tm-t">Task</label><input id="tm-t" name="title" maxlength="100" value="${esc(v.title || '')}" placeholder="e.g. Finish SQL joins practice" autocomplete="off"><span class="err" id="tm-e-title"></span></div>
+      <div class="field"><label for="tm-d">Date</label><input id="tm-d" name="date" type="date" value="${esc(v.date || '')}"><span class="err" id="tm-e-date"></span></div>
+      <div class="field"><label for="tm-tm">Time (optional)</label><input id="tm-tm" name="time" type="time" value="${esc(v.time || '')}"></div>
+      <div class="field"><label for="tm-c">Category</label><select class="sel" id="tm-c" name="cat" style="width:100%">${CATS.map(c => `<option${(v.cat || 'Study') === c ? ' selected' : ''}>${c}</option>`).join('')}</select></div>
+      ${opts.length ? `<div class="field"><label for="tm-r">Link to roadmap step</label><select class="sel" id="tm-r" name="roadmap" style="width:100%"><option value="">None</option>${opts.map(([k, t]) => `<option value="${esc(k)}"${task?.roadmapKey === k ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></div>` : ''}
+      <div class="field wide"><label for="tm-n">Notes (optional)</label><input id="tm-n" name="notes" maxlength="200" value="${esc(v.notes || '')}" autocomplete="off"></div>`;
+    const r = $('#tm-r'); if (r) r.onchange = () => { const t = $('#tm-t'); if (r.value && !t.value.trim()) t.value = r.selectedOptions[0].textContent; };
+    $('#task-modal').hidden = false; document.body.classList.add('lock'); NexPath.icons(); $('#tm-t').focus();
+  }
+  function submit() {
+    const v = Object.fromEntries(new FormData($('#tm-form'))); v.title = (v.title || '').trim();
+    const e = {}; if (!v.title) e.title = 'Give the task a name.'; if (!/^\d{4}-\d{2}-\d{2}$/.test(v.date || '') || isNaN(parse(v.date))) e.date = 'Pick a date.';
+    ['title', 'date'].forEach(k => { $('#tm-e-' + k).textContent = e[k] || ''; });
+    if (e.title || e.date) return toast('Fix the highlighted fields to save.', 'error');
+    const all = tasks(), data = { title: v.title, date: v.date, time: v.time || '', cat: v.cat, notes: (v.notes || '').trim(), roadmapKey: v.roadmap || '' };
+    if (editing) { const t = all.find(x => x.id === editing); if (t) Object.assign(t, data); }
+    else all.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), done: false, ...data });
+    save(all); sel = v.date; cur = new Date(parse(v.date).getFullYear(), parse(v.date).getMonth(), 1);
+    const wasEdit = !!editing; closeModal(); toast(wasEdit ? 'Task updated.' : 'Task added.', 'success');
+    wasEdit ? NexPath.emit('change') : NexPath.logActivity('goal', `Scheduled: ${v.title}`);
+  }
+
+  function bind() {
+    document.querySelectorAll('[data-day]').forEach(b => b.onclick = () => { sel = b.dataset.day; NexPath.emit('change'); });
+    document.querySelectorAll('[data-cal]').forEach(b => b.onclick = () => {
+      const a = b.dataset.cal;
+      if (a === 'add') return openModal();
+      if (a === 'prev') cur = new Date(cur.getFullYear(), cur.getMonth() - 1, 1);
+      if (a === 'next') cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+      if (a === 'today') { const n = new Date(); cur = new Date(n.getFullYear(), n.getMonth(), 1); sel = ymd(n); }
+      NexPath.emit('change');
+    });
+    document.querySelectorAll('[data-tk]').forEach(b => b.onclick = () => {
+      const all = tasks(), t = all.find(x => x.id === b.dataset.id); if (!t) return;
+      if (b.dataset.tk === 'edit') return openModal(t);
+      if (b.dataset.tk === 'del') { save(all.filter(x => x !== t)); toast('Task deleted.', 'success'); return NexPath.emit('change'); }
+      t.done = !t.done; save(all);
+      if (t.roadmapKey) { const rd = storage.get('roadmapDone', {}); t.done ? rd[t.roadmapKey] = true : delete rd[t.roadmapKey]; storage.set('roadmapDone', rd); }
+      t.done ? NexPath.logActivity('goal', `Completed task: ${t.title}`) : NexPath.emit('change');
+    });
+  }
+  return { view, bind, due };
+})();
+
+</script>
+<script>
+/* Dashboard shell: navigation, routing, rendering. Reads everything from NexPath.storage,
+   so future modules only need to call NexPath.setResume / setCareerMatch. */
+(() => {
+  const { storage, esc, toast, icons } = NexPath;
+  const P = NexPath.profile;
+  const $ = (s, r = document) => r.querySelector(s);
+
+  const NAV = {
+    workspace: [
+      { id: 'overview', label: 'Overview', icon: 'layout-grid' },
+      { id: 'profile', label: 'My Profile', icon: 'user-round' },
+      { id: 'resume', label: 'Resume Analyzer', icon: 'file-search' },
+      { id: 'skills', label: 'Skill Analysis', icon: 'radar' },
+      { id: 'roadmap', label: 'Career Roadmap', icon: 'route' },
+      { id: 'calendar', label: 'Calendar', icon: 'calendar-days' },
+      { id: 'interview', label: 'Mock Interviewer', icon: 'mic' },
+      { id: 'mentor', label: 'AI Career Mentor', icon: 'sparkles' },
+    ],
+    prefs: [
+      { id: 'settings', label: 'Settings', icon: 'settings' },
+      { id: 'help', label: 'Help & Support', icon: 'life-buoy' },
+    ],
+  };
+  const ALL = [...NAV.workspace, ...NAV.prefs];
+  const ACT_ICON = { resume: 'file-up', analysis: 'file-check', profile: 'user-round-pen', goal: 'target' };
+
+  const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; };
+  const firstName = () => (P.get().name || '').trim().split(/\s+/)[0];
+  const initials = () => { const n = (P.get().name || '').trim().split(/\s+/); return n[0] ? (n[0][0] + (n[1]?.[0] || '')).toUpperCase() : 'N'; };
+  const ago = iso => { const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? 'Just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} hr ago` : new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }); };
+
+  /* ---------- Sidebar ---------- */
+  function renderNav(active) {
+    const html = items => items.map(n => `<button class="nav-item${n.id === active ? ' active' : ''}" data-go="${n.id}" ${n.id === active ? 'aria-current="page"' : ''}><i data-lucide="${n.icon}" class="i"></i>${n.label}${n.soon ? '<span class="soon">Soon</span>' : ''}</button>`).join('');
+    $('#nav-workspace').innerHTML = html(NAV.workspace);
+    $('#nav-prefs').innerHTML = html(NAV.prefs);
+  }
+  function renderIdentity() {
+    const p = P.get();
+    $('#me-avatar').textContent = $('#top-avatar').textContent = initials();
+    $('#me-name').textContent = p.name || 'Student';
+    $('#me-sub').textContent = p.college || 'Complete your profile';
+  }
+  const openDrawer = o => { $('#sidebar').classList.toggle('open', o); $('#scrim').hidden = !o; document.body.classList.toggle('lock', o); };
+
+  /* ---------- Reusable components ---------- */
+  const statCard = ({ icon, label, value, text, ok }) => `<article class="card stat"><div class="stat-ico${ok ? ' ok' : ''}"><i data-lucide="${icon}" class="i"></i></div><div><small>${label}</small><div class="val">${esc(value)}</div><p>${esc(text)}</p></div></article>`;
+
+  function resumeCard() {
+    const r = storage.get('resume');
+    return r ? statCard({ icon: 'file-check', label: 'Resume status', value: 'Analyzed', text: `${r.fileName} · ${ago(r.analyzedAt || new Date().toISOString())}`, ok: true })
+             : statCard({ icon: 'file-check', label: 'Resume status', value: 'Not uploaded', text: 'Upload your resume to get started.' });
+  }
+  function matchCard() {
+    const m = storage.get('match');
+    return m && m.score != null ? statCard({ icon: 'target', label: 'Career match', value: m.score + '%', text: m.role ? `Core skill coverage for ${m.role}.` : 'Your career compatibility.', ok: true })
+      : statCard({ icon: 'target', label: 'Career match', value: '—', text: 'Complete your first analysis to see your career compatibility.' });
+  }
+  function profileSection() {
+    const p = P.get(), c = P.completion(p);
+    const item = (ico, label, v) => `<div class="check${v ? ' done' : ''}"><b><i data-lucide="${v ? 'check-circle-2' : 'circle-dashed'}" class="i"></i>${label}</b><span>${v ? esc(v) : 'Not added'}</span></div>`;
+    const edu = [p.degree, p.branch].filter(Boolean).join(', ');
+    const skills = Object.values((storage.get('resume') || {}).skills || {}).flat().length;
+    return `<section class="card panel"><div class="panel-head"><div><h2>Your career profile</h2><p class="sec-sub">Complete your profile to receive more personalized recommendations.</p></div><button class="btn${c.pct < 100 ? ' btn-primary' : ''}" data-act="edit-profile"><i data-lucide="pencil-line" class="i"></i>${c.pct < 100 ? 'Complete profile' : 'Edit profile'}</button></div>
+      <div class="pct"><strong>${c.pct}%</strong><div class="bar" role="progressbar" aria-valuenow="${c.pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${c.pct}%"></i></div></div>
+      <div class="checks">${item('', 'Education', edu)}${item('', 'Career interests', p.interests)}${item('', 'Target role', p.role)}${item('', 'Skills', skills ? skills + ' extracted' : '')}</div></section>`;
+  }
+  function skillsSection() {
+    const groups = (storage.get('resume') || {}).skills || {};
+    const names = Object.keys(groups).filter(k => groups[k]?.length);
+    const body = names.length ? names.map(g => `<div class="skillgroup"><h3>${esc(g)}</h3><div class="chips">${groups[g].map(s => `<span class="chip">${esc(s)}</span>`).join('')}</div></div>`).join('')
+      : `<div class="empty"><div class="stat-ico"><i data-lucide="layers" class="i"></i></div><p>Your skills will appear here once your resume has been analyzed.</p><button class="btn btn-primary" data-go="resume"><i data-lucide="file-up" class="i"></i>Analyze resume</button></div>`;
+    return `<section class="card panel"><div class="panel-head"><div><h2>Your skills</h2><p class="sec-sub">An overview of your technical and professional skills.</p></div></div>${body}</section>`;
+  }
+  function activitySection() {
+    const list = storage.get('activity', []);
+    const body = list.length ? `<ul class="activity">${list.slice(0, 6).map(a => `<li><i data-lucide="${ACT_ICON[a.type] || 'circle'}" class="i"></i><span>${esc(a.text)}</span><time>${ago(a.at)}</time></li>`).join('')}</ul>`
+      : `<div class="empty"><div class="stat-ico"><i data-lucide="history" class="i"></i></div><p>Resume uploads, analyses, profile updates and goal changes will show up here as you use NexPath.</p><button class="btn" data-act="edit-profile">Start with your profile</button></div>`;
+    return `<section class="card panel"><div class="panel-head"><div><h2>Recent activity</h2></div></div>${body}</section>`;
+  }
+  const ACTIONS = [
+    { icon: 'file-up', t: 'Upload resume', d: 'Start your first analysis', go: 'resume' },
+    { icon: 'user-round-pen', t: 'Edit profile', d: 'Keep your details current', act: 'edit-profile' },
+    { icon: 'compass', t: 'Explore career paths', d: 'See roles that fit you', go: 'roadmap' },
+    { icon: 'radar', t: 'View skill analysis', d: 'Find your skill gaps', go: 'skills' },
+  ];
+  const quickActions = () => `<section><h2 style="margin-bottom:14px">Quick actions</h2><div class="actions">${ACTIONS.map(a => `<button class="card action" ${a.go ? `data-go="${a.go}"` : `data-act="${a.act}"`}><div class="stat-ico"><i data-lucide="${a.icon}" class="i"></i></div><b>${a.t}</b><small>${a.d}</small></button>`).join('')}</div></section>`;
+
+  /* ---------- Views ---------- */
+  const heroArt = `<svg viewBox="0 0 360 170" aria-hidden="true"><path class="path-line" d="M20 130 C90 130 90 50 170 50 S260 120 340 40"/><circle cx="20" cy="130" r="9" style="fill:var(--surface);stroke:var(--accent)" stroke-width="3"/><circle cx="170" cy="50" r="9" style="fill:var(--surface);stroke:var(--bd3)" stroke-width="3"/><circle cx="340" cy="40" r="12" style="fill:var(--accent)"/><circle cx="340" cy="40" r="22" style="fill:none;stroke:var(--accent)" stroke-opacity=".25"/></svg>`;
+  const views = {
+    resume: () => NexPath.resume.view(),
+    skills: () => NexPath.skillAnalysis.view(),
+    roadmap: () => NexPath.roadmap.view(),
+    calendar: () => NexPath.calendar.view(),
+    interview: () => NexPath.interview.view(),
+    mentor: () => NexPath.mentor.view(),
+    settings: () => NexPath.prefs.view() + NexPath.ai.settingsView(),
+    help: () => NexPath.help.view(),
+    overview: () => `<div><h1>${greeting()}${firstName() ? ', ' + esc(firstName()) : ''}</h1><p class="sub">Here's your career development overview.</p></div>
+      <section class="card hero"><div><h2>Your career journey starts here.</h2><p>Understand your skills, discover your gaps, and build a career path aligned with industry expectations.</p><div class="cta"><button class="btn btn-primary" data-go="resume"><i data-lucide="file-search" class="i"></i>Analyze My Resume</button><small>Upload your resume to discover your professional strengths.</small></div></div>${heroArt}</section>
+      <div class="grid2" id="stat-cards">${resumeCard()}${matchCard()}</div>${profileSection()}${skillsSection()}${activitySection()}${quickActions()}`,
+    profile: () => {
+      const p = P.get(), c = P.completion(p);
+      return `<div><h1>My profile</h1><p class="sub">The details NexPath uses to personalize your recommendations.</p></div>
+      <section class="card panel"><div class="panel-head"><div><h2>${c.pct}% complete</h2><p class="sec-sub">${c.done} of ${c.total} fields filled in.</p></div><button class="btn btn-primary" data-act="edit-profile"><i data-lucide="pencil-line" class="i"></i>Edit profile</button></div>
+      <dl class="plist">${P.FIELDS.map(f => `<div><dt>${f.label}</dt><dd>${p[f.key] ? esc(p[f.key]) : '<span style="color:var(--ink3)">Not added</span>'}</dd></div>`).join('')}</dl></section>`;
+    },
+  };
+  function comingSoon(n) {
+    return `<div class="card cs"><div class="stat-ico"><i data-lucide="${n.icon}" class="i"></i></div><h1 style="font-size:24px">${n.label}</h1><p>${n.soon} Your profile and activity are saved, so you can pick up right where you left off.</p><button class="btn btn-primary" data-go="overview"><i data-lucide="arrow-left" class="i"></i>Back to overview</button></div>`;
+  }
+
+  /* ---------- Router ---------- */
+  let current = 'overview';
+  function render(first) {
+    const id = ALL.some(n => n.id === current) ? current : 'overview';
+    const nav = ALL.find(n => n.id === id);
+    NexPath.skillAnalysis.sync();
+    const view = $('#view');
+    renderNav(id); renderIdentity();
+    view.innerHTML = views[id] ? views[id]() : comingSoon(nav);
+    icons();
+    if (id === 'resume') NexPath.resume.bind();
+    if (id === 'skills') NexPath.skillAnalysis.bind();
+    if (id === 'roadmap') NexPath.roadmap.bind();
+    if (id === 'calendar') NexPath.calendar.bind();
+    renderNotifs();
+    if (id === 'interview') NexPath.interview.bind();
+    if (id === 'mentor') NexPath.mentor.bind();
+    if (id === 'settings') { NexPath.prefs.bind(); NexPath.ai.settingsBind(); }
+    if (id === 'help') NexPath.help.bind();
+    if (!first) { view.focus({ preventScroll: true }); }
+  }
+  function go(id) {
+    const n = ALL.find(x => x.id === id); if (!n) return;
+    current = id; history.replaceState(null, '', '#' + id);
+    openDrawer(false); render();
+    window.scrollTo({ top: 0 });
+    if (n.soon) toast(n.soon, 'info');
+  }
+
+  /* ---------- Notifications & popovers ---------- */
+  function renderNotifs() {
+    const read = storage.get('notifsRead', false), due = NexPath.calendar.due(), items = [];
+    const plural = n => `${n} task${n === 1 ? '' : 's'}`;
+    if (due.overdue.length) items.push(['alert-circle', `${plural(due.overdue.length)} overdue`, 'Open your calendar to catch up.']);
+    if (due.today.length) items.push(['calendar-check', `${plural(due.today.length)} due today`, due.today.slice(0, 2).map(t => t.title).join(', ')]);
+    $('#bell-dot').hidden = read && !items.length;
+    $('#notif-list').innerHTML = items.map(([ic, t, s]) => `<div class="notif" data-go="calendar" style="cursor:pointer"><i data-lucide="${ic}" class="i"></i><div><strong>${esc(t)}</strong><p>${esc(s)}</p></div></div>`).join('') +
+      `<div class="notif"><i data-lucide="sparkles" class="i"></i><div><strong>Welcome to NexPath</strong><p>Complete your profile, then analyze your resume to unlock your career insights.</p></div></div>`;
+    icons();
+  }
+  function togglePop(btn, pop, force) {
+    const open = force ?? pop.hidden;
+    document.querySelectorAll('.pop').forEach(p => p.hidden = true);
+    document.querySelectorAll('[aria-expanded]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+    pop.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+  }
+
+  /* ---------- Init ---------- */
+  document.addEventListener('DOMContentLoaded', () => {
+    $('#today').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    P.init();
+    current = location.hash.slice(1) || 'overview';
+    $('#view').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+    const boot = () => { render(true); renderNotifs(); };
+    window.lucide ? setTimeout(boot, 250) : window.addEventListener('load', () => setTimeout(boot, 250));
+
+    document.addEventListener('click', e => {
+      const goBtn = e.target.closest('[data-go]'), act = e.target.closest('[data-act]');
+      if (goBtn) { togglePop($('#bell'), $('#bell-pop'), false); return go(goBtn.dataset.go); }
+      if (act) {
+        togglePop($('#bell'), $('#bell-pop'), false);
+        if (act.dataset.act === 'edit-profile') P.open();
+        if (act.dataset.act === 'reset' && confirm('Remove your saved profile and activity from this browser?')) {
+          Object.keys(localStorage).filter(k => k.startsWith('nexpath:')).forEach(k => localStorage.removeItem(k));
+          render(); renderNotifs(); toast('Saved data cleared.', 'success');
+        }
+        return;
+      }
+      if (e.target.closest('#bell')) return togglePop($('#bell'), $('#bell-pop'));
+      if (e.target.closest('#profile-btn')) return togglePop($('#profile-btn'), $('#profile-pop'));
+      if (e.target.closest('#me-card')) return go('profile');
+      if (e.target.closest('#menu-btn')) return openDrawer(true);
+      if (e.target.closest('#scrim')) return openDrawer(false);
+      if (e.target.closest('#mark-read')) { storage.set('notifsRead', true); renderNotifs(); return toast('All notifications marked as read.', 'success'); }
+      if (!e.target.closest('.pop')) document.querySelectorAll('.pop').forEach(p => p.hidden = true);
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.querySelectorAll('.pop').forEach(p => p.hidden = true); openDrawer(false); } });
+    window.addEventListener('hashchange', () => { const id = location.hash.slice(1); if (id && id !== current) { current = id; render(); } });
+    NexPath.on('change', () => render());
+  });
+  window.addEventListener('storage', () => render());
+})();
+
+</script>
+</body>
+</html>
