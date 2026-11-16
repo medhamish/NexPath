@@ -141,7 +141,8 @@
     current = location.hash.slice(1) || 'overview';
     $('#view').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
     const boot = () => { render(true); renderNotifs(); };
-    window.lucide ? setTimeout(boot, 250) : window.addEventListener('load', () => setTimeout(boot, 250));
+    const start = () => NexPath.ready.then(boot);
+    window.lucide ? setTimeout(start, 250) : window.addEventListener('load', () => setTimeout(start, 250));
 
     document.addEventListener('click', e => {
       const goBtn = e.target.closest('[data-go]'), act = e.target.closest('[data-act]');
@@ -151,6 +152,7 @@
         if (act.dataset.act === 'edit-profile') P.open();
         if (act.dataset.act === 'reset' && confirm('Remove your saved profile and activity from this browser?')) {
           Object.keys(localStorage).filter(k => k.startsWith('nexpath:')).forEach(k => localStorage.removeItem(k));
+          NexPath.resetRemote();
           render(); renderNotifs(); toast('Saved data cleared.', 'success');
         }
         return;
